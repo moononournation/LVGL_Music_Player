@@ -5,14 +5,16 @@
  *
  * Dependent libraries:
  * LVGL: https://github.com/lvgl/lvgl.git
+ * Audio: https://github.com/schreibfaul1/ESP32-audioI2S.git
+ * JPEGDEC: https://github.com/bitbank2/JPEGDEC.git
  *
  * LVGL Configuration file:
  * Copy your_arduino_path/libraries/lvgl/lv_conf_template.h
  * to your_arduino_path/libraries/lv_conf.h
- * 
+ *
  * In lv_conf.h around line 15, enable config file:
  * #if 1 // Set it to "1" to enable content
- * 
+ *
  * Then find and set:
  * #define LV_COLOR_DEPTH     16
  * #define LV_TICK_CUSTOM     1
@@ -20,11 +22,29 @@
  * For SPI/parallel 8 display set color swap can be faster, parallel 16/RGB screen don't swap!
  * #define LV_COLOR_16_SWAP   1 // for SPI and parallel 8
  * #define LV_COLOR_16_SWAP   0 // for parallel 16 and RGB
- * 
+ *
  * #define LV_FONT_FMT_TXT_LARGE 1
  ******************************************************************************/
 #include <lvgl.h>
 #include "ui.h"
+
+#include <JPEGDEC.h>
+JPEGDEC jpegdec;
+
+#include <SD_MMC.h>
+#include <Audio.h>
+Audio audio;
+
+// microSD card
+#define SD_SCK 48
+#define SD_MISO 41
+#define SD_MOSI 47
+#define SD_CS 42
+
+// I2S
+#define I2S_DOUT 40
+#define I2S_BCLK 1
+#define I2S_LRCK 2
 
 /*******************************************************************************
  * Start of Arduino_GFX setting
@@ -75,6 +95,7 @@ static uint32_t screenHeight;
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
+static lv_color_t *cbuf;
 
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -89,6 +110,17 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 #endif
 
   lv_disp_flush_ready(disp);
+}
+
+// pixel drawing callback
+static int jpegDrawCallback(JPEGDRAW *pDraw)
+{
+  // Serial.printf("Draw pos = %d,%d. size = %d x %d\n", pDraw->x, pDraw->y, pDraw->iWidth, pDraw->iHeight);
+  gfx_draw_bitmap_to_framebuffer(
+    pDraw->pPixels, pDraw->iWidth, pDraw->iHeight,
+    (uint16_t *)cbuf, pDraw->x, pDraw->y, 240, 240);
+
+  return 1;
 }
 
 void setup()
@@ -146,7 +178,27 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
+    cbuf = (lv_color_t *)malloc(240 * 240 * 2);
+    // In ui.c, replace "ui_ImageCover = lv_gif_create(ui_Screen1);" to "ui_ImageCover = lv_canvas_create(ui_Screen1);"
+    lv_canvas_set_buffer(ui_ImageCover, cbuf, 240, 240, LV_IMG_CF_TRUE_COLOR);
+
     Serial.println("Setup done");
+  }
+
+  pinMode(SD_CS /* CS */, OUTPUT);
+  digitalWrite(SD_CS /* CS */, HIGH);
+  SD_MMC.setPins(SD_SCK /* CLK */, SD_MOSI /* CMD/MOSI */, SD_MISO /* D0/MISO */);
+  if (!SD_MMC.begin("/root", true))
+  {
+    Serial.println(F("ERROR: SD_MMC Mount Failed!"));
+  }
+  else
+  {
+    audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
+    audio.setVolume(4); // 0...21
+    audio.connecttoFS(SD_MMC, "陳曉東 - 借借你肩膊.mp3");
+
+    xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
   }
 }
 
@@ -154,4 +206,36 @@ void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
   delay(5);
+}
+
+void Task_Audio(void *pvParameters) // This is a task.
+{
+  while (1)
+    audio.loop();
+}
+
+void audio_id3data(const char *info)
+{ // id3 metadata
+  Serial.print("id3data     ");
+  Serial.println(info);
+}
+void audio_id3image(File &file, const size_t pos, const size_t size)
+{
+  Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, size);
+  uint8_t *coverImgBuf = (uint8_t *)malloc(size);
+  file.seek(pos);
+  file.read(coverImgBuf, size);
+  Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
+  Serial.printf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
+
+  jpegdec.openRAM(coverImgBuf + 14, size - 14, jpegDrawCallback);
+  jpegdec.decode(0, 0, 0);
+  jpegdec.close();
+
+  lv_obj_invalidate(ui_ImageCover);
+}
+void audio_eof_mp3(const char *info)
+{ // end of file
+  Serial.print("eof_mp3     ");
+  Serial.println(info);
 }

@@ -1,10 +1,10 @@
 // SquareLine LVGL GENERATED FILE
 // EDITOR VERSION: SquareLine Studio 1.2.1
 // LVGL VERSION: 8.2.0
-// PROJECT: SquareLine_Project
+// PROJECT: Lvgl_Music_Player
 
-#ifndef _SQUARELINE_PROJECT_UI_HELPERS_H
-#define _SQUARELINE_PROJECT_UI_HELPERS_H
+#ifndef _LVGL_MUSIC_PLAYER_UI_HELPERS_H
+#define _LVGL_MUSIC_PLAYER_UI_HELPERS_H
 
 #include "ui.h"
 
