@@ -97,6 +97,10 @@ static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
 static lv_color_t *cbuf;
 
+static char song_list[10][255];
+static int song_list_len = 0;
+static int song_idx = 0;
+
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
 {
@@ -196,7 +200,30 @@ void setup()
   {
     audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
     audio.setVolume(4); // 0...21
-    audio.connecttoFS(SD_MMC, "陳曉東 - 借借你肩膊.mp3");
+
+    File root = SD_MMC.open("/");
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            log_i("DIR: %s", file.name());
+        } else {
+          const char *filename = file.name();
+
+          int8_t len = strlen(filename);
+          const char *MP3_EXT = ".mp3";
+          if (
+            (filename[0] != '.')
+            && (strcmp(MP3_EXT, &filename[len-4]) == 0)
+          ) {
+            log_i("Song file: %s, size: %d", filename, file.size());
+            strcpy(song_list[song_list_len++], (char *)filename);
+          }
+        }
+        file = root.openNextFile();
+    }
+
+    log_i("Play: %s", song_list[song_idx]);
+    audio.connecttoFS(SD_MMC, song_list[song_idx++]);
 
     xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
   }
@@ -238,4 +265,11 @@ void audio_eof_mp3(const char *info)
 { // end of file
   Serial.print("eof_mp3     ");
   Serial.println(info);
+
+  log_i("Play: %s", song_list[song_idx]);
+  audio.connecttoFS(SD_MMC, song_list[song_idx++]);
+  if (song_idx >= song_list_len)
+  {
+    song_idx = 0;
+  }
 }
