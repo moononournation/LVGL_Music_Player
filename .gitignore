@@ -1,8 +1,5 @@
 .*
-*.bin
-*.cfg
-*.json
 *.otf
-*.svd
 backup
 cache
+Lvgl_Music_Player/ui_font_NotoSansCJKhk.c
