@@ -1,12 +1,16 @@
+#define MP3_COVER_IMG_W 192
+#define MP3_COVER_IMG_H 192
+
 /*******************************************************************************
- * LVGL Hello World
+ * LVGL Music Player
  * This is a simple example for LVGL - Light and Versatile Graphics Library
  * import from: https://github.com/lvgl/lv_demos.git
  *
  * Dependent libraries:
  * LVGL: https://github.com/lvgl/lvgl.git
- * Audio: https://github.com/schreibfaul1/ESP32-audioI2S.git
  * JPEGDEC: https://github.com/bitbank2/JPEGDEC.git
+ * TouchLib: https://github.com/mmMicky/TouchLib.git
+ * Audio: https://github.com/schreibfaul1/ESP32-audioI2S.git
  *
  * LVGL Configuration file:
  * Copy your_arduino_path/libraries/lvgl/lv_conf_template.h
@@ -24,6 +28,8 @@
  * #define LV_COLOR_16_SWAP   0 // for parallel 16 and RGB
  *
  * #define LV_FONT_FMT_TXT_LARGE 1
+ * #define LV_USE_FONT_COMPRESSED 1
+ * #define LV_USE_FONT_SUBPX 1
  ******************************************************************************/
 #include <lvgl.h>
 #include "ui.h"
@@ -31,16 +37,24 @@
 #include <JPEGDEC.h>
 JPEGDEC jpegdec;
 
+#include <TouchLib.h>
 #include <SD_MMC.h>
 #include <Audio.h>
 Audio audio;
 
+// ESP32S3_2_1_TP
+// TOUCH
+#define TOUCH_MODULES_CST_MUTUAL
+#define TOUCH_SCL 45
+#define TOUCH_SDA 19
+#define TOUCH_INT 40
+#define TOUCH_RES -1
+#define TOUCH_ADD 0x1A
 // microSD card
 #define SD_SCK 48
 #define SD_MISO 41
 #define SD_MOSI 47
 #define SD_CS 42
-
 // I2S
 #define I2S_DOUT 40
 #define I2S_BCLK 1
@@ -97,9 +111,9 @@ static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
 static lv_color_t *cbuf;
 
-static char song_list[10][255];
-static int song_list_len = 0;
-static int song_idx = 0;
+static int song_count = 0;
+static uint32_t currentSongDuration = 0;
+static uint32_t currentArcTime = 0;
 
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -116,15 +130,71 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
   lv_disp_flush_ready(disp);
 }
 
+void ui_event_RollerPlayList(lv_event_t *e)
+{
+  lv_event_code_t event_code = lv_event_get_code(e);
+  lv_obj_t *target = lv_event_get_target(e);
+  if (event_code == LV_EVENT_CLICKED)
+  {
+    char buf[256];
+    lv_roller_get_selected_str(target, buf, sizeof(buf));
+  }
+}
+
 // pixel drawing callback
 static int jpegDrawCallback(JPEGDRAW *pDraw)
 {
   // Serial.printf("Draw pos = %d,%d. size = %d x %d\n", pDraw->x, pDraw->y, pDraw->iWidth, pDraw->iHeight);
   gfx_draw_bitmap_to_framebuffer(
-    pDraw->pPixels, pDraw->iWidth, pDraw->iHeight,
-    (uint16_t *)cbuf, pDraw->x, pDraw->y, 240, 240);
+      pDraw->pPixels, pDraw->iWidth, pDraw->iHeight,
+      (uint16_t *)cbuf, pDraw->x, pDraw->y, MP3_COVER_IMG_W, MP3_COVER_IMG_H);
 
   return 1;
+}
+
+void read_song_list()
+{
+  String stringSongList = "";
+
+  File root = SD_MMC.open("/");
+  File file = root.openNextFile();
+  while (file)
+  {
+    if (file.isDirectory())
+    {
+      Serial.printf("DIR: %s\n", file.name());
+    }
+    else
+    {
+      const char *filename = file.name();
+
+      int8_t len = strlen(filename);
+      const char *MP3_EXT = ".mp3";
+      if (
+          (filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
+      {
+        Serial.printf("Song file: %s, size: %d\n", filename, file.size());
+        if (song_count > 0)
+        {
+          stringSongList += '\n';
+        }
+        stringSongList += filename;
+        song_count++;
+      }
+    }
+    file = root.openNextFile();
+  }
+  lv_roller_set_options(ui_RollerPlayList, stringSongList.c_str(), LV_ROLLER_MODE_NORMAL);
+}
+
+void play_selected_song()
+{
+  char song_filename[256];
+  lv_roller_get_selected_str(ui_RollerPlayList, song_filename, sizeof(song_filename));
+  Serial.printf("Play: %s\n", song_filename);
+  audio.connecttoFS(SD_MMC, song_filename);
+  currentSongDuration = 0;
+  currentArcTime = 0;
 }
 
 void setup()
@@ -182,9 +252,19 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    cbuf = (lv_color_t *)malloc(240 * 240 * 2);
-    // In ui.c, replace "ui_ImageCover = lv_gif_create(ui_Screen1);" to "ui_ImageCover = lv_canvas_create(ui_Screen1);"
-    lv_canvas_set_buffer(ui_ImageCover, cbuf, 240, 240, LV_IMG_CF_TRUE_COLOR);
+    cbuf = (lv_color_t *)malloc(MP3_COVER_IMG_W * MP3_COVER_IMG_H * 2);
+    if (!cbuf)
+    {
+      Serial.println("LVGL cbuf allocate failed!");
+    }
+    else
+    {
+      // In ui.c, replace "ui_ImageCover = lv_img_create(ui_Screen1);" to "ui_ImageCover = lv_canvas_create(ui_Screen1);"
+      lv_canvas_set_buffer(ui_ImageCover, cbuf, MP3_COVER_IMG_W, MP3_COVER_IMG_H, LV_IMG_CF_TRUE_COLOR);
+      lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_add_event_cb(ui_RollerPlayList, ui_event_RollerPlayList, LV_EVENT_ALL, NULL);
+    }
 
     Serial.println("Setup done");
   }
@@ -201,29 +281,8 @@ void setup()
     audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
     audio.setVolume(4); // 0...21
 
-    File root = SD_MMC.open("/");
-    File file = root.openNextFile();
-    while(file){
-        if(file.isDirectory()){
-            log_i("DIR: %s", file.name());
-        } else {
-          const char *filename = file.name();
-
-          int8_t len = strlen(filename);
-          const char *MP3_EXT = ".mp3";
-          if (
-            (filename[0] != '.')
-            && (strcmp(MP3_EXT, &filename[len-4]) == 0)
-          ) {
-            log_i("Song file: %s, size: %d", filename, file.size());
-            strcpy(song_list[song_list_len++], (char *)filename);
-          }
-        }
-        file = root.openNextFile();
-    }
-
-    log_i("Play: %s", song_list[song_idx]);
-    audio.connecttoFS(SD_MMC, song_list[song_idx++]);
+    read_song_list();
+    play_selected_song();
 
     xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
   }
@@ -237,8 +296,23 @@ void loop()
 
 void Task_Audio(void *pvParameters) // This is a task.
 {
-  while (1)
+  while (true)
+  {
     audio.loop();
+    if (currentSongDuration == 0)
+    {
+      currentSongDuration = audio.getAudioFileDuration();
+      // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
+      lv_arc_set_range(ui_ArcTime, 0, currentSongDuration);
+    }
+    uint32_t currentTime = audio.getAudioCurrentTime();
+    if (currentTime != currentArcTime)
+    {
+      currentArcTime = currentTime;
+      // Serial.printf("currentTime: %d\n", currentTime);
+      lv_arc_set_value(ui_ArcTime, currentArcTime);
+    }
+  }
 }
 
 void audio_id3data(const char *info)
@@ -249,27 +323,35 @@ void audio_id3data(const char *info)
 void audio_id3image(File &file, const size_t pos, const size_t size)
 {
   Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, size);
-  uint8_t *coverImgBuf = (uint8_t *)malloc(size);
-  file.seek(pos);
-  file.read(coverImgBuf, size);
-  Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
-  Serial.printf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
+  if (cbuf)
+  {
+    uint8_t *coverImgBuf = (uint8_t *)malloc(size);
+    if (coverImgBuf)
+    {
+      file.seek(pos);
+      file.read(coverImgBuf, size);
+      Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
+      Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
 
-  jpegdec.openRAM(coverImgBuf + 14, size - 14, jpegDrawCallback);
-  jpegdec.decode(0, 0, 0);
-  jpegdec.close();
+      jpegdec.openRAM(coverImgBuf + 14, size - 14, jpegDrawCallback);
+      jpegdec.decode(0, 0, 0);
+      jpegdec.close();
 
-  lv_obj_invalidate(ui_ImageCover);
+      lv_obj_invalidate(ui_ImageCover);
+    }
+  }
 }
 void audio_eof_mp3(const char *info)
 { // end of file
   Serial.print("eof_mp3     ");
   Serial.println(info);
 
-  log_i("Play: %s", song_list[song_idx]);
-  audio.connecttoFS(SD_MMC, song_list[song_idx++]);
-  if (song_idx >= song_list_len)
+  uint16_t selected_id = lv_roller_get_selected(ui_RollerPlayList);
+  selected_id++;
+  if (selected_id >= song_count)
   {
-    song_idx = 0;
+    selected_id = 0;
   }
+  lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
+  play_selected_song();
 }
