@@ -1,27 +1,17 @@
-#define MP3_COVER_IMG_W 192
-#define MP3_COVER_IMG_H 192
-
-// ESP32S3_2_1_TP
-// TOUCH
-#define TOUCH_MODULES_CST_MUTUAL // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
-#define TOUCH_SCL 45
-#define TOUCH_SDA 19
-#define TOUCH_RES -1
-#define TOUCH_ADD 0x1A
-// microSD card
-#define SD_SCK 48
-#define SD_MISO 41
-#define SD_MOSI 47
-#define SD_CS 42
-// I2S
-#define I2S_DOUT 40
-#define I2S_BCLK 1
-#define I2S_LRCK 2
-
 /*******************************************************************************
  * LVGL Music Player
- * This is a simple example for LVGL - Light and Versatile Graphics Library
- * import from: https://github.com/lvgl/lv_demos.git
+ * A simple implementation of a Music Player
+ * UI can be substaintial changed by SquareLine with single source code
+ * 
+ * TODO:
+ * scalable cover image
+ * read ID3 Lyrics
+ * display Lyrics in time
+ * change Lyrics font colors
+ * Volume control
+ * prev/next song
+ * sound spectrum
+ * debug
  *
  * Dependent libraries:
  * LVGL: https://github.com/lvgl/lvgl.git
@@ -48,6 +38,26 @@
  * #define LV_USE_FONT_COMPRESSED 1
  * #define LV_USE_FONT_SUBPX 1
  ******************************************************************************/
+#define MP3_COVER_IMG_W 192
+#define MP3_COVER_IMG_H 192
+
+// ESP32S3_2_1_TP
+// TOUCH
+#define TOUCH_MODULES_CST_MUTUAL // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
+#define TOUCH_SCL 45
+#define TOUCH_SDA 19
+#define TOUCH_RES -1
+#define TOUCH_ADD 0x1A
+// microSD card
+#define SD_SCK 48
+#define SD_MISO 41
+#define SD_MOSI 47
+#define SD_CS 42
+// I2S
+#define I2S_DOUT 40
+#define I2S_BCLK 1
+#define I2S_LRCK 2
+
 #include <lvgl.h>
 #include "ui.h"
 
