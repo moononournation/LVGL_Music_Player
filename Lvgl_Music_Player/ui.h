@@ -23,8 +23,8 @@ extern "C" {
 #endif
 
 extern lv_obj_t *ui_Screen1;
-extern lv_obj_t *ui_RollerPlayList;
 extern lv_obj_t *ui_ArcTime;
+extern lv_obj_t *ui_RollerPlayList;
 extern lv_obj_t *ui_ImageCover;
 extern lv_obj_t *ui_LabelLyric;
 

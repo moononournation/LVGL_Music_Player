@@ -1,6 +1,23 @@
 #define MP3_COVER_IMG_W 192
 #define MP3_COVER_IMG_H 192
 
+// ESP32S3_2_1_TP
+// TOUCH
+#define TOUCH_MODULES_CST_MUTUAL // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
+#define TOUCH_SCL 45
+#define TOUCH_SDA 19
+#define TOUCH_RES -1
+#define TOUCH_ADD 0x1A
+// microSD card
+#define SD_SCK 48
+#define SD_MISO 41
+#define SD_MOSI 47
+#define SD_CS 42
+// I2S
+#define I2S_DOUT 40
+#define I2S_BCLK 1
+#define I2S_LRCK 2
+
 /*******************************************************************************
  * LVGL Music Player
  * This is a simple example for LVGL - Light and Versatile Graphics Library
@@ -37,28 +54,13 @@
 #include <JPEGDEC.h>
 JPEGDEC jpegdec;
 
-#include <TouchLib.h>
-#include <SD_MMC.h>
 #include <Audio.h>
 Audio audio;
 
-// ESP32S3_2_1_TP
-// TOUCH
-#define TOUCH_MODULES_CST_MUTUAL
-#define TOUCH_SCL 45
-#define TOUCH_SDA 19
-#define TOUCH_INT 40
-#define TOUCH_RES -1
-#define TOUCH_ADD 0x1A
-// microSD card
-#define SD_SCK 48
-#define SD_MISO 41
-#define SD_MOSI 47
-#define SD_CS 42
-// I2S
-#define I2S_DOUT 40
-#define I2S_BCLK 1
-#define I2S_LRCK 2
+#include <SD_MMC.h>
+
+#include <TouchLib.h>
+TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_ADD);
 
 /*******************************************************************************
  * Start of Arduino_GFX setting
@@ -111,9 +113,11 @@ static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
 static lv_color_t *cbuf;
 
+static bool isPlaying = false;
+static bool isSelectedSongChanged = false;
 static int song_count = 0;
 static uint32_t currentSongDuration = 0;
-static uint32_t currentArcTime = 0;
+static uint32_t currentTimeProgress = 0;
 
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -130,15 +134,32 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
   lv_disp_flush_ready(disp);
 }
 
-void ui_event_RollerPlayList(lv_event_t *e)
+void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
-  lv_event_code_t event_code = lv_event_get_code(e);
-  lv_obj_t *target = lv_event_get_target(e);
-  if (event_code == LV_EVENT_CLICKED)
+  if (touch.read())
   {
-    char buf[256];
-    lv_roller_get_selected_str(target, buf, sizeof(buf));
+    data->state = LV_INDEV_STATE_PR;
+
+    TP_Point t = touch.getPoint(0);
+    /*Set the coordinates*/
+    data->point.x = t.x;
+    data->point.y = t.y;
   }
+  else
+  {
+    data->state = LV_INDEV_STATE_REL;
+  }
+}
+
+void timeProgressChanged(lv_event_t *e)
+{
+  int16_t selectedTime = lv_arc_get_value(ui_ArcTime);
+  audio.setAudioPlayPosition(selectedTime);
+}
+
+void playListChanged(lv_event_t *e)
+{
+  isSelectedSongChanged = true;
 }
 
 // pixel drawing callback
@@ -184,17 +205,19 @@ void read_song_list()
     }
     file = root.openNextFile();
   }
-  lv_roller_set_options(ui_RollerPlayList, stringSongList.c_str(), LV_ROLLER_MODE_NORMAL);
+  lv_roller_set_options(ui_RollerPlayList, stringSongList.c_str(), LV_ROLLER_MODE_INFINITE);
 }
 
 void play_selected_song()
 {
+  isPlaying = false;
   char song_filename[256];
   lv_roller_get_selected_str(ui_RollerPlayList, song_filename, sizeof(song_filename));
   Serial.printf("Play: %s\n", song_filename);
   audio.connecttoFS(SD_MMC, song_filename);
   currentSongDuration = 0;
-  currentArcTime = 0;
+  currentTimeProgress = 0;
+  isPlaying = true;
 }
 
 void setup()
@@ -216,6 +239,17 @@ void setup()
   pinMode(GFX_BL, OUTPUT);
   digitalWrite(GFX_BL, HIGH);
 #endif
+
+  // init touch
+#if (TOUCH_RES > 0)
+  pinMode(TOUCH_RES, OUTPUT);
+  digitalWrite(TOUCH_RES, 0);
+  delay(200);
+  digitalWrite(TOUCH_RES, 1);
+  delay(200);
+#endif
+  Wire.begin(TOUCH_SDA, TOUCH_SCL);
+  touch.init();
 
   lv_init();
 
@@ -243,10 +277,11 @@ void setup()
     disp_drv.draw_buf = &draw_buf;
     lv_disp_drv_register(&disp_drv);
 
-    /* Initialize the (dummy) input device driver */
+    /* Initialize the input device driver */
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = my_touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
     /* Init SquareLine prepared UI */
@@ -259,11 +294,12 @@ void setup()
     }
     else
     {
+      lv_obj_add_event_cb(ui_ArcTime, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
       // In ui.c, replace "ui_ImageCover = lv_img_create(ui_Screen1);" to "ui_ImageCover = lv_canvas_create(ui_Screen1);"
       lv_canvas_set_buffer(ui_ImageCover, cbuf, MP3_COVER_IMG_W, MP3_COVER_IMG_H, LV_IMG_CF_TRUE_COLOR);
       lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
-      lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-      lv_obj_add_event_cb(ui_RollerPlayList, ui_event_RollerPlayList, LV_EVENT_ALL, NULL);
+      lv_obj_set_style_text_line_space(ui_RollerPlayList, -10, LV_PART_MAIN | LV_STATE_DEFAULT);
+      lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
     }
 
     Serial.println("Setup done");
@@ -284,7 +320,7 @@ void setup()
     read_song_list();
     play_selected_song();
 
-    xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, 0);
   }
 }
 
@@ -292,26 +328,38 @@ void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
   delay(5);
+  if (isSelectedSongChanged)
+  {
+    isSelectedSongChanged = false;
+    play_selected_song();
+  }
 }
 
 void Task_Audio(void *pvParameters) // This is a task.
 {
   while (true)
   {
-    audio.loop();
-    if (currentSongDuration == 0)
+    if (isPlaying)
     {
-      currentSongDuration = audio.getAudioFileDuration();
-      // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
-      lv_arc_set_range(ui_ArcTime, 0, currentSongDuration);
+      audio.loop();
+      if (currentSongDuration == 0)
+      {
+        currentSongDuration = audio.getAudioFileDuration();
+        if (currentSongDuration > 0)
+        {
+          // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
+          lv_arc_set_range(ui_ArcTime, 0, currentSongDuration);
+        }
+      }
+      uint32_t currentTime = audio.getAudioCurrentTime();
+      if (currentTime != currentTimeProgress)
+      {
+        currentTimeProgress = currentTime;
+        // Serial.printf("currentTime: %d\n", currentTime);
+        lv_arc_set_value(ui_ArcTime, currentTimeProgress);
+      }
     }
-    uint32_t currentTime = audio.getAudioCurrentTime();
-    if (currentTime != currentArcTime)
-    {
-      currentArcTime = currentTime;
-      // Serial.printf("currentTime: %d\n", currentTime);
-      lv_arc_set_value(ui_ArcTime, currentArcTime);
-    }
+    delay(5);
   }
 }
 
@@ -353,5 +401,4 @@ void audio_eof_mp3(const char *info)
     selected_id = 0;
   }
   lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
-  play_selected_song();
 }
