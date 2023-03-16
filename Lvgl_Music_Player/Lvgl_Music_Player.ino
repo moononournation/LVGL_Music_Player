@@ -2,7 +2,7 @@
  * LVGL Music Player
  * A simple implementation of a Music Player
  * UI can be substaintial changed by SquareLine with single source code
- * 
+ *
  * TODO:
  * scalable cover image
  * read ID3 Lyrics
@@ -37,9 +37,13 @@
  * #define LV_FONT_FMT_TXT_LARGE 1
  * #define LV_USE_FONT_COMPRESSED 1
  * #define LV_USE_FONT_SUBPX 1
+ *
+ * #define LV_USE_SJPG 1
+ *
+ * #define LV_MEM_CUSTOM 1
  ******************************************************************************/
-#define MP3_COVER_IMG_W 192
-#define MP3_COVER_IMG_H 192
+#define MP3_COVER_IMG_W 160
+#define MP3_COVER_IMG_H 160
 
 // ESP32S3_2_1_TP
 // TOUCH
@@ -121,13 +125,19 @@ static uint32_t screenHeight;
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t *disp_draw_buf;
 static lv_disp_drv_t disp_drv;
-static lv_color_t *cbuf;
 
 static bool isPlaying = false;
 static bool isSelectedSongChanged = false;
 static int song_count = 0;
 static uint32_t currentSongDuration = 0;
 static uint32_t currentTimeProgress = 0;
+static size_t coverImgFileSize = 0;
+static uint8_t *coverImgFile;
+static int16_t coverImgBitmapW;
+static int16_t coverImgBitmapH;
+static size_t coverImgBitmapSize = 0;
+static uint8_t *coverImgBitmap;
+static lv_img_dsc_t img_cover;
 
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -161,9 +171,16 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
   }
 }
 
+void volumeChanged(lv_event_t *e)
+{
+  // int16_t volume = lv_slider_get_value(ui_ScaleVolume);
+  int16_t volume = lv_arc_get_value(ui_ScaleVolume);
+  audio.setVolume(volume);
+}
+
 void timeProgressChanged(lv_event_t *e)
 {
-  int16_t selectedTime = lv_arc_get_value(ui_ArcTime);
+  int16_t selectedTime = lv_slider_get_value(ui_ScaleProgress);
   audio.setAudioPlayPosition(selectedTime);
 }
 
@@ -178,7 +195,7 @@ static int jpegDrawCallback(JPEGDRAW *pDraw)
   // Serial.printf("Draw pos = %d,%d. size = %d x %d\n", pDraw->x, pDraw->y, pDraw->iWidth, pDraw->iHeight);
   gfx_draw_bitmap_to_framebuffer(
       pDraw->pPixels, pDraw->iWidth, pDraw->iHeight,
-      (uint16_t *)cbuf, pDraw->x, pDraw->y, MP3_COVER_IMG_W, MP3_COVER_IMG_H);
+      (uint16_t *)coverImgBitmap, pDraw->x, pDraw->y, coverImgBitmapW, coverImgBitmapH);
 
   return 1;
 }
@@ -297,20 +314,11 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    cbuf = (lv_color_t *)malloc(MP3_COVER_IMG_W * MP3_COVER_IMG_H * 2);
-    if (!cbuf)
-    {
-      Serial.println("LVGL cbuf allocate failed!");
-    }
-    else
-    {
-      lv_obj_add_event_cb(ui_ArcTime, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
-      // In ui.c, replace "ui_ImageCover = lv_img_create(ui_Screen1);" to "ui_ImageCover = lv_canvas_create(ui_Screen1);"
-      lv_canvas_set_buffer(ui_ImageCover, cbuf, MP3_COVER_IMG_W, MP3_COVER_IMG_H, LV_IMG_CF_TRUE_COLOR);
-      lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
-      lv_obj_set_style_text_line_space(ui_RollerPlayList, -10, LV_PART_MAIN | LV_STATE_DEFAULT);
-      lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
-    }
+    lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
 
     Serial.println("Setup done");
   }
@@ -358,7 +366,7 @@ void Task_Audio(void *pvParameters) // This is a task.
         if (currentSongDuration > 0)
         {
           // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
-          lv_arc_set_range(ui_ArcTime, 0, currentSongDuration);
+          lv_slider_set_range(ui_ScaleProgress, 0, currentSongDuration);
         }
       }
       uint32_t currentTime = audio.getAudioCurrentTime();
@@ -366,7 +374,7 @@ void Task_Audio(void *pvParameters) // This is a task.
       {
         currentTimeProgress = currentTime;
         // Serial.printf("currentTime: %d\n", currentTime);
-        lv_arc_set_value(ui_ArcTime, currentTimeProgress);
+        lv_slider_set_value(ui_ScaleProgress, currentTimeProgress, LV_ANIM_ON);
       }
     }
     delay(5);
@@ -381,22 +389,84 @@ void audio_id3data(const char *info)
 void audio_id3image(File &file, const size_t pos, const size_t size)
 {
   Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, size);
-  if (cbuf)
+  if (coverImgFileSize == 0)
   {
-    uint8_t *coverImgBuf = (uint8_t *)malloc(size);
-    if (coverImgBuf)
+    coverImgFile = (uint8_t *)malloc(size);
+    coverImgFileSize = size;
+  }
+  else if (size > coverImgFileSize)
+  {
+    coverImgFile = (uint8_t *)realloc(coverImgFile, size);
+    coverImgFileSize = size;
+  }
+  if (coverImgFile)
+  {
+    file.seek(pos);
+    file.read(coverImgFile, size);
+    Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
+    Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
+
+    jpegdec.openRAM(coverImgFile + 14, size - 14, jpegDrawCallback);
+
+    int scale = 0;
+    coverImgBitmapW = jpegdec.getWidth();
+    coverImgBitmapH = jpegdec.getHeight();
+
+    if (
+      (coverImgBitmapW >= (MP3_COVER_IMG_W * 8))
+      || (coverImgBitmapH >= (MP3_COVER_IMG_H * 8))
+    )
     {
-      file.seek(pos);
-      file.read(coverImgBuf, size);
-      Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
-      Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgBuf[0], coverImgBuf[1], coverImgBuf[2], coverImgBuf[3], coverImgBuf[4], coverImgBuf[5], coverImgBuf[6], coverImgBuf[7], coverImgBuf[8], coverImgBuf[9], coverImgBuf[10], coverImgBuf[11], coverImgBuf[12], coverImgBuf[13], coverImgBuf[14], coverImgBuf[15]);
-
-      jpegdec.openRAM(coverImgBuf + 14, size - 14, jpegDrawCallback);
-      jpegdec.decode(0, 0, 0);
-      jpegdec.close();
-
-      lv_obj_invalidate(ui_ImageCover);
+      scale = JPEG_SCALE_EIGHTH;
+      coverImgBitmapW >>= 3;
+      coverImgBitmapH >>= 3;
     }
+    else if (
+      (coverImgBitmapW >= (MP3_COVER_IMG_W * 4))
+      || (coverImgBitmapH >= (MP3_COVER_IMG_H * 4))
+    )
+    {
+      scale = JPEG_SCALE_QUARTER;
+      coverImgBitmapW >>= 2;
+      coverImgBitmapH >>= 2;
+    }
+    else if (
+      (coverImgBitmapW >= (MP3_COVER_IMG_W * 2))
+      || (coverImgBitmapH >= (MP3_COVER_IMG_H * 2))
+    )
+    {
+      scale = JPEG_SCALE_HALF;
+      coverImgBitmapW >>= 1;
+      coverImgBitmapH >>= 1;
+    }
+
+    size_t dataSize = coverImgBitmapW * coverImgBitmapH * 2;
+    if (coverImgBitmapSize == 0)
+    {
+      coverImgBitmap = (uint8_t *)malloc(dataSize);
+      coverImgBitmapSize = dataSize;
+    }
+    else if (coverImgBitmapSize < dataSize)
+    {
+      coverImgBitmap = (uint8_t *)realloc(coverImgBitmap, dataSize);
+      coverImgBitmapSize = dataSize;
+    }
+
+    jpegdec.decode(0, 0, scale);
+    jpegdec.close();
+
+    img_cover.header.cf = LV_IMG_CF_TRUE_COLOR;
+    img_cover.header.w = coverImgBitmapW;
+    img_cover.header.h = coverImgBitmapH;
+    img_cover.header.always_zero = 0;
+    img_cover.data_size = dataSize;
+    img_cover.data = coverImgBitmap;
+
+    lv_img_set_src(ui_ImageCover, &img_cover);
+    uint16_t zW = MP3_COVER_IMG_W * 256 / coverImgBitmapW;
+    uint16_t zH = MP3_COVER_IMG_H * 256 / coverImgBitmapH;
+    Serial.printf("coverImgBitmapW: %d, coverImgBitmapH: %d, zW: %d, zH: %d\n", coverImgBitmapW, coverImgBitmapH, zW, zH);
+    lv_img_set_zoom(ui_ImageCover, (zW < zH)?zW:zH);
   }
 }
 void audio_eof_mp3(const char *info)
@@ -411,4 +481,5 @@ void audio_eof_mp3(const char *info)
     selected_id = 0;
   }
   lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
+  play_selected_song();
 }
