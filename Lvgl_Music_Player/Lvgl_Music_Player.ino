@@ -42,10 +42,10 @@
  *
  * #define LV_MEM_CUSTOM 1
  ******************************************************************************/
-#define MP3_COVER_IMG_W 160
-#define MP3_COVER_IMG_H 160
-
 // ESP32S3_2_1_TP
+// Cover size
+#define MP3_COVER_IMG_W 200
+#define MP3_COVER_IMG_H 150
 // TOUCH
 #define TOUCH_MODULES_CST_MUTUAL // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
 #define TOUCH_SCL 45
@@ -78,23 +78,6 @@ TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_ADD);
 
 /*******************************************************************************
  * Start of Arduino_GFX setting
- *
- * Arduino_GFX try to find the settings depends on selected board in Arduino IDE
- * Or you can define the display dev kit not in the board list
- * Defalult pin list for non display dev kit:
- * Arduino Nano, Micro and more: CS:  9, DC:  8, RST:  7, BL:  6, SCK: 13, MOSI: 11, MISO: 12
- * ESP32 various dev board     : CS:  5, DC: 27, RST: 33, BL: 22, SCK: 18, MOSI: 23, MISO: nil
- * ESP32-C3 various dev board  : CS:  7, DC:  2, RST:  1, BL:  3, SCK:  4, MOSI:  6, MISO: nil
- * ESP32-S2 various dev board  : CS: 34, DC: 38, RST: 33, BL: 21, SCK: 36, MOSI: 35, MISO: nil
- * ESP32-S3 various dev board  : CS: 40, DC: 41, RST: 42, BL: 48, SCK: 36, MOSI: 35, MISO: nil
- * ESP8266 various dev board   : CS: 15, DC:  4, RST:  2, BL:  5, SCK: 14, MOSI: 13, MISO: 12
- * Raspberry Pi Pico dev board : CS: 17, DC: 27, RST: 26, BL: 28, SCK: 18, MOSI: 19, MISO: 16
- * RTL8720 BW16 old patch core : CS: 18, DC: 17, RST:  2, BL: 23, SCK: 19, MOSI: 21, MISO: 20
- * RTL8720_BW16 Official core  : CS:  9, DC:  8, RST:  6, BL:  3, SCK: 10, MOSI: 12, MISO: 11
- * RTL8722 dev board           : CS: 18, DC: 17, RST: 22, BL: 23, SCK: 13, MOSI: 11, MISO: 12
- * RTL8722_mini dev board      : CS: 12, DC: 14, RST: 15, BL: 13, SCK: 11, MOSI:  9, MISO: 10
- * Seeeduino XIAO dev board    : CS:  3, DC:  2, RST:  1, BL:  0, SCK:  8, MOSI: 10, MISO:  9
- * Teensy 4.1 dev board        : CS: 39, DC: 41, RST: 40, BL: 22, SCK: 13, MOSI: 11, MISO: 12
  ******************************************************************************/
 #include <Arduino_GFX_Library.h>
 /* More data bus class: https://github.com/moononournation/Arduino_GFX/wiki/Data-Bus-Class */
@@ -245,6 +228,7 @@ void play_selected_song()
   currentSongDuration = 0;
   currentTimeProgress = 0;
   isPlaying = true;
+  lv_img_set_src(ui_ImageCover, nullptr);
 }
 
 void setup()
@@ -345,7 +329,7 @@ void setup()
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-  delay(5);
+  delay(1);
   if (isSelectedSongChanged)
   {
     isSelectedSongChanged = false;
@@ -377,7 +361,7 @@ void Task_Audio(void *pvParameters) // This is a task.
         lv_slider_set_value(ui_ScaleProgress, currentTimeProgress, LV_ANIM_ON);
       }
     }
-    delay(5);
+    delay(1);
   }
 }
 
@@ -412,61 +396,59 @@ void audio_id3image(File &file, const size_t pos, const size_t size)
     coverImgBitmapW = jpegdec.getWidth();
     coverImgBitmapH = jpegdec.getHeight();
 
-    if (
-      (coverImgBitmapW >= (MP3_COVER_IMG_W * 8))
-      || (coverImgBitmapH >= (MP3_COVER_IMG_H * 8))
-    )
+    if ((coverImgBitmapW >= (MP3_COVER_IMG_W * 8)) || (coverImgBitmapH >= (MP3_COVER_IMG_H * 8)))
     {
       scale = JPEG_SCALE_EIGHTH;
       coverImgBitmapW >>= 3;
       coverImgBitmapH >>= 3;
     }
-    else if (
-      (coverImgBitmapW >= (MP3_COVER_IMG_W * 4))
-      || (coverImgBitmapH >= (MP3_COVER_IMG_H * 4))
-    )
+    else if ((coverImgBitmapW >= (MP3_COVER_IMG_W * 4)) || (coverImgBitmapH >= (MP3_COVER_IMG_H * 4)))
     {
       scale = JPEG_SCALE_QUARTER;
       coverImgBitmapW >>= 2;
       coverImgBitmapH >>= 2;
     }
-    else if (
-      (coverImgBitmapW >= (MP3_COVER_IMG_W * 2))
-      || (coverImgBitmapH >= (MP3_COVER_IMG_H * 2))
-    )
+    else if ((coverImgBitmapW >= (MP3_COVER_IMG_W * 2)) || (coverImgBitmapH >= (MP3_COVER_IMG_H * 2)))
     {
       scale = JPEG_SCALE_HALF;
       coverImgBitmapW >>= 1;
       coverImgBitmapH >>= 1;
     }
+    Serial.printf("coverImgBitmapW: %d, coverImgBitmapH: %d\n", coverImgBitmapW, coverImgBitmapH);
 
-    size_t dataSize = coverImgBitmapW * coverImgBitmapH * 2;
-    if (coverImgBitmapSize == 0)
+    if (
+        (coverImgBitmapW > 0) && (coverImgBitmapH > 0))
     {
-      coverImgBitmap = (uint8_t *)malloc(dataSize);
-      coverImgBitmapSize = dataSize;
+      size_t imgBitmapSize = coverImgBitmapW * coverImgBitmapH * 2;
+      if (coverImgBitmapSize == 0)
+      {
+        coverImgBitmap = (uint8_t *)malloc(imgBitmapSize);
+        coverImgBitmapSize = imgBitmapSize;
+      }
+      else if (coverImgBitmapSize < imgBitmapSize)
+      {
+        coverImgBitmap = (uint8_t *)realloc(coverImgBitmap, imgBitmapSize);
+        coverImgBitmapSize = imgBitmapSize;
+      }
+      if (coverImgBitmap)
+      {
+        jpegdec.decode(0, 0, scale);
+
+        img_cover.header.cf = LV_IMG_CF_TRUE_COLOR;
+        img_cover.header.w = coverImgBitmapW;
+        img_cover.header.h = coverImgBitmapH;
+        img_cover.header.always_zero = 0;
+        img_cover.data_size = imgBitmapSize;
+        img_cover.data = coverImgBitmap;
+
+        uint16_t zW = MP3_COVER_IMG_W * 256 / coverImgBitmapW;
+        uint16_t zH = MP3_COVER_IMG_H * 256 / coverImgBitmapH;
+        Serial.printf("zW: %d, zH: %d\n", zW, zH);
+        lv_img_set_zoom(ui_ImageCover, (zW < zH) ? zW : zH);
+        lv_img_set_src(ui_ImageCover, &img_cover);
+      }
+      jpegdec.close();
     }
-    else if (coverImgBitmapSize < dataSize)
-    {
-      coverImgBitmap = (uint8_t *)realloc(coverImgBitmap, dataSize);
-      coverImgBitmapSize = dataSize;
-    }
-
-    jpegdec.decode(0, 0, scale);
-    jpegdec.close();
-
-    img_cover.header.cf = LV_IMG_CF_TRUE_COLOR;
-    img_cover.header.w = coverImgBitmapW;
-    img_cover.header.h = coverImgBitmapH;
-    img_cover.header.always_zero = 0;
-    img_cover.data_size = dataSize;
-    img_cover.data = coverImgBitmap;
-
-    lv_img_set_src(ui_ImageCover, &img_cover);
-    uint16_t zW = MP3_COVER_IMG_W * 256 / coverImgBitmapW;
-    uint16_t zH = MP3_COVER_IMG_H * 256 / coverImgBitmapH;
-    Serial.printf("coverImgBitmapW: %d, coverImgBitmapH: %d, zW: %d, zH: %d\n", coverImgBitmapW, coverImgBitmapH, zW, zH);
-    lv_img_set_zoom(ui_ImageCover, (zW < zH)?zW:zH);
   }
 }
 void audio_eof_mp3(const char *info)
