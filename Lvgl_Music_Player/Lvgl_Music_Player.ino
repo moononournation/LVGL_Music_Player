@@ -17,7 +17,7 @@
  * LVGL: https://github.com/lvgl/lvgl.git
  * JPEGDEC: https://github.com/bitbank2/JPEGDEC.git
  * TouchLib: https://github.com/mmMicky/TouchLib.git
- * Audio: https://github.com/schreibfaul1/ESP32-audioI2S.git
+ * Audio: https://github.com/moononournation/ESP32-audioI2S.git
  *
  * LVGL Configuration file:
  * Copy your_arduino_path/libraries/lvgl/lv_conf_template.h
@@ -112,6 +112,7 @@ static lv_disp_drv_t disp_drv;
 static bool isPlaying = false;
 static bool isSelectedSongChanged = false;
 static int song_count = 0;
+static char textBuf[6];
 static uint32_t currentSongDuration = 0;
 static uint32_t currentTimeProgress = 0;
 static size_t coverImgFileSize = 0;
@@ -121,6 +122,11 @@ static int16_t coverImgBitmapH;
 static size_t coverImgBitmapSize = 0;
 static uint8_t *coverImgBitmap;
 static lv_img_dsc_t img_cover;
+static size_t lyricsTextSize = 0;
+static char *lyricsText;
+static uint16_t syncTimeLyricsSec[100];
+static uint8_t syncTimeLyricsLineIdx[100];
+static uint16_t syncTimeLyricsCount = 0;
 
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -227,6 +233,7 @@ void play_selected_song()
   audio.connecttoFS(SD_MMC, song_filename);
   currentSongDuration = 0;
   currentTimeProgress = 0;
+  syncTimeLyricsCount = 0;
   isPlaying = true;
   lv_img_set_src(ui_ImageCover, nullptr);
 }
@@ -300,6 +307,11 @@ void setup()
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_obj_set_style_text_font(ui_RollerLyrics, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui_RollerLyrics, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_time(ui_RollerLyrics, 2000, LV_STATE_DEFAULT);
+
     lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
@@ -351,6 +363,8 @@ void Task_Audio(void *pvParameters) // This is a task.
         {
           // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
           lv_slider_set_range(ui_ScaleProgress, 0, currentSongDuration);
+          sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
+          lv_label_set_text(ui_LabelDuration, textBuf);
         }
       }
       uint32_t currentTime = audio.getAudioCurrentTime();
@@ -359,6 +373,16 @@ void Task_Audio(void *pvParameters) // This is a task.
         currentTimeProgress = currentTime;
         // Serial.printf("currentTime: %d\n", currentTime);
         lv_slider_set_value(ui_ScaleProgress, currentTimeProgress, LV_ANIM_ON);
+        sprintf(textBuf, "%02d:%02d", currentTimeProgress / 60, currentTimeProgress % 60);
+        lv_label_set_text(ui_LabelProgress, textBuf);
+        for (int i = 0; i < syncTimeLyricsCount; ++i)
+        {
+          if (syncTimeLyricsSec[i] == currentTime)
+          {
+
+            lv_roller_set_selected(ui_RollerLyrics, syncTimeLyricsLineIdx[i], LV_ANIM_ON);
+          }
+        }
       }
     }
     delay(1);
@@ -449,6 +473,129 @@ void audio_id3image(File &file, const size_t pos, const size_t size)
       }
       jpegdec.close();
     }
+  }
+}
+void audio_id3lyrics(File &file, const size_t pos, const size_t size)
+{
+  Serial.printf("audio_id3lyrics, pos: %d, size: %d\n", pos, size);
+  if (lyricsTextSize == 0)
+  {
+    lyricsText = (char *)malloc(size);
+    lyricsTextSize = size;
+  }
+  else if (size > lyricsTextSize)
+  {
+    lyricsText = (char *)realloc(coverImgFile, size);
+    lyricsTextSize = size;
+  }
+  if (lyricsText)
+  {
+    file.seek(pos);
+    file.read((uint8_t *)lyricsText, size);
+    audio.unicode2utf8(lyricsText, size);
+    Serial.println(lyricsText);
+
+    size_t idxA = 0;
+    size_t idxB = 0;
+    size_t lastNewLineIdxB = 0;
+    uint8_t lyricsLines = 0;
+    bool isSecTag;
+    uint8_t currentMinute;
+    uint16_t currentSec;
+    bool seenColon;
+    bool seenDecimal;
+    while (idxA < size)
+    {
+      if (lyricsText[idxA] == '[')
+      {
+        char c = lyricsText[++idxA];
+        if ((c >= '0') && (c <= '9'))
+        {
+          isSecTag = true;
+        }
+        else
+        {
+          isSecTag = false;
+        }
+        currentMinute = 0;
+        currentSec = 0;
+        seenColon = false;
+        seenDecimal = false;
+        while (lyricsText[idxA] != ']')
+        {
+          c = lyricsText[idxA++];
+          if (isSecTag)
+          {
+            if ((c >= '0') && (c <= '9'))
+            {
+              if (!seenColon)
+              {
+                currentMinute = (currentMinute * 10) + (c - '0');
+              }
+              else if (!seenDecimal)
+              {
+                currentSec = (currentSec * 10) + (c - '0');
+              }
+            }
+            else if (c == ':')
+            {
+              seenColon = true;
+            }
+            else if (c == '.')
+            {
+              seenDecimal = true;
+            }
+          }
+        }
+        currentSec += currentMinute * 60;
+        if (currentSec > 0)
+        {
+          Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
+          syncTimeLyricsSec[syncTimeLyricsCount] = currentSec;
+          syncTimeLyricsLineIdx[syncTimeLyricsCount] = lyricsLines;
+          ++syncTimeLyricsCount;
+        }
+        ++idxA;
+      }
+      else
+      {
+        if (lyricsText[idxA] != '\r')
+        {
+          if (lyricsText[idxA] == '\n')
+          {
+            if ((idxB - lastNewLineIdxB) > 1)
+            {
+              lastNewLineIdxB = idxB;
+              lyricsText[idxB++] = lyricsText[idxA];
+              ++lyricsLines;
+            }
+            else
+            {
+              if (isSecTag)
+              {
+                --syncTimeLyricsCount; // risky
+              }
+            }
+          }
+          else
+          {
+            lyricsText[idxB++] = lyricsText[idxA];
+          }
+        }
+        ++idxA;
+      }
+    }
+    if (lyricsText[idxB - 1] == '\n')
+    {
+      lyricsText[idxB - 1] = 0;
+    }
+    else
+    {
+      lyricsText[idxB] = 0;
+      ++lyricsLines;
+    }
+
+    lv_roller_set_options(ui_RollerLyrics, lyricsText, LV_ROLLER_MODE_NORMAL);
   }
 }
 void audio_eof_mp3(const char *info)
