@@ -32,11 +32,6 @@
  *
  * #define LV_FONT_FMT_TXT_LARGE 1
  * #define LV_USE_FONT_COMPRESSED 1
- * #define LV_USE_FONT_SUBPX 1
- *
- * #define LV_USE_SJPG 1
- *
- * #define LV_MEM_CUSTOM 1
  ******************************************************************************/
 // ESP32S3_2_1_TP
 // Cover size
