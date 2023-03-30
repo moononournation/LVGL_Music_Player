@@ -4,11 +4,7 @@
  * UI can be substaintial changed by SquareLine with single source code
  *
  * TODO:
- * scalable cover image
- * read ID3 Lyrics
- * display Lyrics in time
  * change Lyrics font colors
- * Volume control
  * prev/next song
  * sound spectrum
  * debug
