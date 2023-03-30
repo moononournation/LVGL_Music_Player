@@ -3,3 +3,5 @@
 backup
 cache
 Lvgl_Music_Player/ui_font_NotoSansCJKhk.c
+Winamp480x320/ui_font_NotoSerifCJKhk.c
+Winamp480x320/ui_img_winamp480x480_png.c
