@@ -42,6 +42,7 @@ LV_IMG_DECLARE( ui_img_winamp480x480_png);   // assets/Winamp480x480.png
 
 LV_FONT_DECLARE( ui_font_NotoSansCJKhk);
 LV_FONT_DECLARE( ui_font_NotoSerifCJKhk);
+LV_FONT_DECLARE( ui_font_Cubic11);
 
 
 void ui_init(void);

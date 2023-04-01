@@ -48,58 +48,107 @@ lv_obj_add_flag( ui_ImageFrame, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
 lv_obj_clear_flag( ui_ImageFrame, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
 ui_RollerPlayList = lv_roller_create(ui_Screen1);
-lv_roller_set_options( ui_RollerPlayList, "陳曉東 - 借借你肩膊\n陳奕迅 - 時代曲\n黃子華 - 關老三", LV_ROLLER_MODE_INFINITE );
-lv_obj_set_width( ui_RollerPlayList, 244);
-lv_obj_set_height( ui_RollerPlayList, 146);
-lv_obj_set_x( ui_RollerPlayList, -107 );
-lv_obj_set_y( ui_RollerPlayList, 49 );
+lv_roller_set_options( ui_RollerPlayList, "林俊杰 - 一千年以后.mp3\n陳奕迅 - 時代曲.mp3\n陳曉東 - 甚麼吸引.mp3\n陳曉東 - 借借你肩膊.mp3\n黃子華 - 關老三.mp3\nBlack Box Recorder - Weekend.mp3\nFatboy - 塚。愛.mp3\nS.E.N.S - Alegretto.mp3", LV_ROLLER_MODE_INFINITE );
+lv_obj_set_width( ui_RollerPlayList, 256);
+lv_obj_set_height( ui_RollerPlayList, 170);
+lv_obj_set_x( ui_RollerPlayList, -101 );
+lv_obj_set_y( ui_RollerPlayList, 61 );
 lv_obj_set_align( ui_RollerPlayList, LV_ALIGN_CENTER );
 lv_obj_set_style_text_color(ui_RollerPlayList, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_RollerPlayList, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_letter_space(ui_RollerPlayList, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_line_space(ui_RollerPlayList, 2, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_radius(ui_RollerPlayList, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 lv_obj_set_style_text_color(ui_RollerPlayList, lv_color_hex(0x00CC00), LV_PART_SELECTED | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_RollerPlayList, 255, LV_PART_SELECTED| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_color(ui_RollerPlayList, lv_color_hex(0xFF7F00), LV_PART_SELECTED | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_color(ui_RollerPlayList, lv_color_hex(0x0000FF), LV_PART_SELECTED | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_RollerPlayList, 255, LV_PART_SELECTED| LV_STATE_DEFAULT);
 
 ui_ScaleVolume = lv_slider_create(ui_Screen1);
-lv_obj_set_width( ui_ScaleVolume, 92);
-lv_obj_set_height( ui_ScaleVolume, 6);
-lv_obj_set_x( ui_ScaleVolume, -78 );
-lv_obj_set_y( ui_ScaleVolume, -100 );
+lv_slider_set_range(ui_ScaleVolume, 0,31);
+lv_slider_set_value( ui_ScaleVolume, 4, LV_ANIM_OFF);
+if (lv_slider_get_mode(ui_ScaleVolume)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_ScaleVolume, 0, LV_ANIM_OFF);
+lv_obj_set_width( ui_ScaleVolume, 156);
+lv_obj_set_height( ui_ScaleVolume, 5);
+lv_obj_set_x( ui_ScaleVolume, -52 );
+lv_obj_set_y( ui_ScaleVolume, -115 );
 lv_obj_set_align( ui_ScaleVolume, LV_ALIGN_CENTER );
+lv_obj_set_style_radius(ui_ScaleVolume, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_ScaleVolume, lv_color_hex(0x7F3F00), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_ScaleVolume, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+lv_obj_set_style_radius(ui_ScaleVolume, 0, LV_PART_INDICATOR| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_ScaleVolume, lv_color_hex(0xFF7F00), LV_PART_INDICATOR | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_ScaleVolume, 255, LV_PART_INDICATOR| LV_STATE_DEFAULT);
+
+lv_obj_set_style_radius(ui_ScaleVolume, 0, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_ScaleVolume, lv_color_hex(0x393B50), LV_PART_KNOB | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_ScaleVolume, 255, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_border_color(ui_ScaleVolume, lv_color_hex(0x656378), LV_PART_KNOB | LV_STATE_DEFAULT );
+lv_obj_set_style_border_opa(ui_ScaleVolume, 255, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_border_width(ui_ScaleVolume, 1, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_left(ui_ScaleVolume, 2, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_right(ui_ScaleVolume, 2, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_top(ui_ScaleVolume, 2, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_bottom(ui_ScaleVolume, 2, LV_PART_KNOB| LV_STATE_DEFAULT);
 
 ui_ScaleProgress = lv_slider_create(ui_Screen1);
-lv_obj_set_width( ui_ScaleProgress, 240);
-lv_obj_set_height( ui_ScaleProgress, 6);
+lv_slider_set_value( ui_ScaleProgress, 50, LV_ANIM_OFF);
+if (lv_slider_get_mode(ui_ScaleProgress)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_ScaleProgress, 0, LV_ANIM_OFF);
+lv_obj_set_width( ui_ScaleProgress, 250);
+lv_obj_set_height( ui_ScaleProgress, 8);
 lv_obj_set_x( ui_ScaleProgress, -100 );
 lv_obj_set_y( ui_ScaleProgress, -83 );
 lv_obj_set_align( ui_ScaleProgress, LV_ALIGN_CENTER );
+lv_obj_set_style_radius(ui_ScaleProgress, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+lv_obj_set_style_radius(ui_ScaleProgress, 0, LV_PART_INDICATOR| LV_STATE_DEFAULT);
+
+lv_obj_set_style_radius(ui_ScaleProgress, 0, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_ScaleProgress, lv_color_hex(0x997200), LV_PART_KNOB | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_ScaleProgress, 255, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_border_color(ui_ScaleProgress, lv_color_hex(0x664C00), LV_PART_KNOB | LV_STATE_DEFAULT );
+lv_obj_set_style_border_opa(ui_ScaleProgress, 255, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_border_width(ui_ScaleProgress, 1, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_left(ui_ScaleProgress, 3, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_right(ui_ScaleProgress, 3, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_top(ui_ScaleProgress, 1, LV_PART_KNOB| LV_STATE_DEFAULT);
+lv_obj_set_style_pad_bottom(ui_ScaleProgress, 1, LV_PART_KNOB| LV_STATE_DEFAULT);
 
 ui_RollerLyrics = lv_roller_create(ui_Screen1);
-lv_roller_set_options( ui_RollerLyrics, "Option 1\nOption 2\nOption 3", LV_ROLLER_MODE_NORMAL );
-lv_obj_set_width( ui_RollerLyrics, 178);
-lv_obj_set_height( ui_RollerLyrics, 256);
-lv_obj_set_x( ui_RollerLyrics, 138 );
-lv_obj_set_y( ui_RollerLyrics, -10 );
+lv_roller_set_options( ui_RollerLyrics, "一千年以后 - 林俊杰 (JJ Lin)\n词：李瑞洵\n曲：林俊杰\n心跳乱了节奏\n梦也不自由\n爱 是个绝对承诺 不说\n撑到一千年以后\n放任无奈 淹没尘埃\n我在废墟之中守着你走来\nWoo\n我的泪光 承载不了\nWoo\n所有一切你要的爱\n因为在 一千年以后\n世界早已没有我\n无法深情挽着你的手\n浅吻着你额头\n别等到 一千年以后\n所有人都遗忘了我\n那时红色黄昏的沙漠\n能有谁 解开缠绕千年的寂寞\nWu\n放任无奈 淹没尘埃\n我在废墟之中守着你走来\nWoo\n我的泪光 承载不了 喔\n所有一切你需要的爱\n因为在 一千年以后\n世界早已没有我\n无法深情挽着你的手\n浅吻着你额头\n别等到 一千年以后\n所有人都遗忘了我\n那时红色黄昏的沙漠\n能有谁 解开缠绕千年的寂寞\n无法深情挽着你的手\n浅吻着你额头\n别等到 一千年以后\n所有人都遗忘了我\n那时红色黄昏的沙漠\n能有谁\n解开缠绕千年的寂寞\nWu\n缠绕千年的寂寞", LV_ROLLER_MODE_NORMAL );
+lv_obj_set_width( ui_RollerLyrics, 186);
+lv_obj_set_height( ui_RollerLyrics, 286);
+lv_obj_set_x( ui_RollerLyrics, 139 );
+lv_obj_set_y( ui_RollerLyrics, 3 );
 lv_obj_set_align( ui_RollerLyrics, LV_ALIGN_CENTER );
+lv_obj_set_style_text_letter_space(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_line_space(ui_RollerLyrics, 2, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_RollerLyrics, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_radius(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 lv_obj_set_style_bg_color(ui_RollerLyrics, lv_color_hex(0x000000), LV_PART_SELECTED | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_RollerLyrics, 255, LV_PART_SELECTED| LV_STATE_DEFAULT);
 
 ui_Panel2 = lv_obj_create(ui_Screen1);
-lv_obj_set_width( ui_Panel2, 178);
+lv_obj_set_width( ui_Panel2, 186);
 lv_obj_set_height( ui_Panel2, 100);
-lv_obj_set_x( ui_Panel2, 138 );
-lv_obj_set_y( ui_Panel2, -88 );
+lv_obj_set_x( ui_Panel2, 139 );
+lv_obj_set_y( ui_Panel2, -90 );
 lv_obj_set_align( ui_Panel2, LV_ALIGN_CENTER );
 lv_obj_clear_flag( ui_Panel2, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_radius(ui_Panel2, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_Panel2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_Panel2, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_border_width(ui_Panel2, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_ImageCover = lv_img_create(ui_Screen1);
 lv_obj_set_width( ui_ImageCover, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_ImageCover, LV_SIZE_CONTENT);   /// 1
 lv_obj_set_x( ui_ImageCover, 138 );
-lv_obj_set_y( ui_ImageCover, -88 );
+lv_obj_set_y( ui_ImageCover, -90 );
 lv_obj_set_align( ui_ImageCover, LV_ALIGN_CENTER );
 lv_obj_add_flag( ui_ImageCover, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
 lv_obj_clear_flag( ui_ImageCover, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
@@ -107,24 +156,24 @@ lv_obj_clear_flag( ui_ImageCover, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 ui_LabelProgress = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelProgress, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_LabelProgress, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_LabelProgress, -167 );
-lv_obj_set_y( ui_LabelProgress, -128 );
+lv_obj_set_x( ui_LabelProgress, -154 );
+lv_obj_set_y( ui_LabelProgress, -132 );
 lv_obj_set_align( ui_LabelProgress, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelProgress,"00:00");
 lv_obj_set_style_text_color(ui_LabelProgress, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelProgress, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelProgress, &ui_font_NotoSansCJKhk, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelProgress, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelDuration = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelDuration, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_LabelDuration, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_LabelDuration, -167 );
-lv_obj_set_y( ui_LabelDuration, -114 );
+lv_obj_set_x( ui_LabelDuration, -154 );
+lv_obj_set_y( ui_LabelDuration, -120 );
 lv_obj_set_align( ui_LabelDuration, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelDuration,"00:00");
 lv_obj_set_style_text_color(ui_LabelDuration, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelDuration, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelDuration, &ui_font_NotoSansCJKhk, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelDuration, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 }
 

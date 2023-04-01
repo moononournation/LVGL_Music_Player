@@ -286,15 +286,10 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
-
-    lv_obj_set_style_text_font(ui_RollerLyrics, &ui_font_NotoSansCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui_RollerLyrics, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_anim_time(ui_RollerLyrics, 2000, LV_STATE_DEFAULT);
 
-    lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSansCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
 
     Serial.println("Setup done");
