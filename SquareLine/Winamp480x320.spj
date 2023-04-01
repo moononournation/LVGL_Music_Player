@@ -304,8 +304,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -107,
-                  49
+                  -101,
+                  61
                 ],
                 "InheritedType": 7
               },
@@ -314,8 +314,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  244,
-                  146
+                  256,
+                  170
                 ],
                 "InheritedType": 7
               },
@@ -441,7 +441,7 @@
               {
                 "nid": 1566174118,
                 "strtype": "ROLLER/Options",
-                "strval": "陳曉東 - 借借你肩膊\\n陳奕迅 - 時代曲\\n黃子華 - 關老三",
+                "strval": "林俊杰 - 一千年以后.mp3\\n陳奕迅 - 時代曲.mp3\\n陳曉東 - 甚麼吸引.mp3\\n陳曉東 - 借借你肩膊.mp3\\n黃子華 - 關老三.mp3\\nBlack Box Recorder - Weekend.mp3\\nFatboy - 塚。愛.mp3\\nS.E.N.S - Alegretto.mp3",
                 "InheritedType": 10
               },
               {
@@ -468,6 +468,26 @@
                           255
                         ],
                         "InheritedType": 7
+                      },
+                      {
+                        "nid": -1449954878,
+                        "strtype": "_style/Text_Spacing",
+                        "intarray": [
+                          0,
+                          2
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": 561775077,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Cubic11",
+                        "InheritedType": 3
+                      },
+                      {
+                        "nid": -1130302750,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
                       }
                     ],
                     "InheritedType": 1
@@ -501,9 +521,9 @@
                         "nid": -1086636993,
                         "strtype": "_style/Bg_Color",
                         "intarray": [
-                          255,
-                          127,
                           0,
+                          0,
+                          255,
                           255
                         ],
                         "InheritedType": 7
@@ -559,8 +579,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -78,
-                  -100
+                  -52,
+                  -115
                 ],
                 "InheritedType": 7
               },
@@ -569,8 +589,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  92,
-                  6
+                  156,
+                  5
                 ],
                 "InheritedType": 7
               },
@@ -704,7 +724,7 @@
                 "strtype": "SLIDER/Range",
                 "intarray": [
                   0,
-                  100
+                  31
                 ],
                 "InheritedType": 7
               },
@@ -717,6 +737,7 @@
               {
                 "nid": 807698420,
                 "strtype": "SLIDER/Value",
+                "integer": 4,
                 "InheritedType": 6
               },
               {
@@ -726,7 +747,32 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": -623903278,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 1401273049,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -926719752,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          127,
+                          63,
+                          0,
+                          255
+                        ],
+                        "InheritedType": 7
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 434012590,
                 "strtype": "SLIDER/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad",
@@ -734,7 +780,32 @@
               },
               {
                 "part": "lv.PART.INDICATOR",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 1456061949,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": -768347671,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -268229478,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          127,
+                          0,
+                          255
+                        ],
+                        "InheritedType": 7
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 1463179156,
                 "strtype": "SLIDER/Style_indicator",
                 "strval": "lv.PART.INDICATOR, Rectangle",
@@ -742,7 +813,60 @@
               },
               {
                 "part": "lv.PART.KNOB",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 867913101,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 384832458,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -329029419,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          57,
+                          59,
+                          80,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": 1317480077,
+                        "strtype": "_style/Border_Color",
+                        "intarray": [
+                          101,
+                          99,
+                          120,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": -309840961,
+                        "strtype": "_style/Border width",
+                        "integer": 1,
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -561688374,
+                        "strtype": "_style/Padding",
+                        "intarray": [
+                          2,
+                          2,
+                          2,
+                          2
+                        ],
+                        "InheritedType": 7
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 1101199166,
                 "strtype": "SLIDER/Style_knob",
                 "strval": "lv.PART.KNOB, Rectangle, Pad",
@@ -800,8 +924,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  240,
-                  6
+                  250,
+                  8
                 ],
                 "InheritedType": 7
               },
@@ -948,6 +1072,7 @@
               {
                 "nid": 1661419382,
                 "strtype": "SLIDER/Value",
+                "integer": 50,
                 "InheritedType": 6
               },
               {
@@ -957,7 +1082,21 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 1836217323,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 1470500148,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 2127889973,
                 "strtype": "SLIDER/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad",
@@ -965,7 +1104,21 @@
               },
               {
                 "part": "lv.PART.INDICATOR",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 1320710079,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 2052684431,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 1137289463,
                 "strtype": "SLIDER/Style_indicator",
                 "strval": "lv.PART.INDICATOR, Rectangle",
@@ -973,7 +1126,60 @@
               },
               {
                 "part": "lv.PART.KNOB",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": -39566828,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": -344373370,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -1596974901,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          153,
+                          114,
+                          0,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": -967298639,
+                        "strtype": "_style/Border_Color",
+                        "intarray": [
+                          102,
+                          76,
+                          0,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": 1536389892,
+                        "strtype": "_style/Border width",
+                        "integer": 1,
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -243774238,
+                        "strtype": "_style/Padding",
+                        "intarray": [
+                          3,
+                          3,
+                          1,
+                          1
+                        ],
+                        "InheritedType": 7
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": -5334045,
                 "strtype": "SLIDER/Style_knob",
                 "strval": "lv.PART.KNOB, Rectangle, Pad",
@@ -1021,8 +1227,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  138,
-                  -10
+                  139,
+                  3
                 ],
                 "InheritedType": 7
               },
@@ -1031,8 +1237,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  178,
-                  256
+                  186,
+                  286
                 ],
                 "InheritedType": 7
               },
@@ -1158,7 +1364,7 @@
               {
                 "nid": 2004381010,
                 "strtype": "ROLLER/Options",
-                "strval": "Option 1\\nOption 2\\nOption 3",
+                "strval": "一千年以后 - 林俊杰 (JJ Lin)\\n词：李瑞洵\\n曲：林俊杰\\n心跳乱了节奏\\n梦也不自由\\n爱 是个绝对承诺 不说\\n撑到一千年以后\\n放任无奈 淹没尘埃\\n我在废墟之中守着你走来\\nWoo\\n我的泪光 承载不了\\nWoo\\n所有一切你要的爱\\n因为在 一千年以后\\n世界早已没有我\\n无法深情挽着你的手\\n浅吻着你额头\\n别等到 一千年以后\\n所有人都遗忘了我\\n那时红色黄昏的沙漠\\n能有谁 解开缠绕千年的寂寞\\nWu\\n放任无奈 淹没尘埃\\n我在废墟之中守着你走来\\nWoo\\n我的泪光 承载不了 喔\\n所有一切你需要的爱\\n因为在 一千年以后\\n世界早已没有我\\n无法深情挽着你的手\\n浅吻着你额头\\n别等到 一千年以后\\n所有人都遗忘了我\\n那时红色黄昏的沙漠\\n能有谁 解开缠绕千年的寂寞\\n无法深情挽着你的手\\n浅吻着你额头\\n别等到 一千年以后\\n所有人都遗忘了我\\n那时红色黄昏的沙漠\\n能有谁\\n解开缠绕千年的寂寞\\nWu\\n缠绕千年的寂寞",
                 "InheritedType": 10
               },
               {
@@ -1169,7 +1375,36 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 1286810437,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 526951405,
+                        "strtype": "_style/Text_Spacing",
+                        "intarray": [
+                          0,
+                          2
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": -1604319603,
+                        "strtype": "_style/Text_Font",
+                        "strval": "Cubic11",
+                        "InheritedType": 3
+                      },
+                      {
+                        "nid": -1232620396,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 1684795281,
                 "strtype": "ROLLER/Style_main",
                 "strval": "lv.PART.MAIN, Text, Rectangle",
@@ -1245,8 +1480,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  138,
-                  -88
+                  139,
+                  -90
                 ],
                 "InheritedType": 7
               },
@@ -1255,7 +1490,7 @@
                 "flags": 17,
                 "strtype": "OBJECT/Size",
                 "intarray": [
-                  178,
+                  186,
                   100
                 ],
                 "InheritedType": 7
@@ -1424,7 +1659,37 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 2022048926,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": -1222654389,
+                        "strtype": "_style/Bg_Radius",
+                        "InheritedType": 6
+                      },
+                      {
+                        "nid": -1524424785,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          0,
+                          0,
+                          0,
+                          255
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": 2100126126,
+                        "strtype": "_style/Border width",
+                        "InheritedType": 6
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": -1547958344,
                 "strtype": "PANEL/Style_main",
                 "strval": "lv.PART.MAIN, Rectangle, Pad, Text",
@@ -1481,7 +1746,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -88
+                  -90
                 ],
                 "InheritedType": 7
               },
@@ -1738,8 +2003,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -167,
-                  -128
+                  -154,
+                  -132
                 ],
                 "InheritedType": 7
               },
@@ -1954,7 +2219,7 @@
                       {
                         "nid": 1268596811,
                         "strtype": "_style/Text_Font",
-                        "strval": "NotoSansCJKhk",
+                        "strval": "Cubic11",
                         "InheritedType": 3
                       }
                     ],
@@ -2014,8 +2279,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -167,
-                  -114
+                  -154,
+                  -120
                 ],
                 "InheritedType": 7
               },
@@ -2230,7 +2495,7 @@
                       {
                         "nid": -1036692537,
                         "strtype": "_style/Text_Font",
-                        "strval": "NotoSansCJKhk",
+                        "strval": "Cubic11",
                         "InheritedType": 3
                       }
                     ],
@@ -2445,7 +2710,7 @@
     "theme_color1": 5,
     "theme_color2": 0,
     "exportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp480x320",
-    "backup_cnt": 5,
+    "backup_cnt": 13,
     "autosave_cnt": 0,
     "lvgl_version": "8.2.0",
     "callfuncsexport": "C_FILE",
