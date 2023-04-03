@@ -224,6 +224,30 @@
                 "InheritedType": 2
               },
               {
+                "nid": -1827952913,
+                "strtype": "ARC/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 1998585714,
+                "strtype": "ARC/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -1999632726,
+                "strtype": "ARC/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -1874915161,
+                "strtype": "ARC/User_4",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
                 "nid": 1654657090,
                 "strtype": "ARC/Arc",
                 "InheritedType": 1
@@ -508,6 +532,30 @@
                 "InheritedType": 2
               },
               {
+                "nid": 1072427619,
+                "strtype": "PANEL/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 124938115,
+                "strtype": "PANEL/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 1513763315,
+                "strtype": "PANEL/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 573349314,
+                "strtype": "PANEL/User_4",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
                 "part": "lv.PART.MAIN",
                 "childs": [
                   {
@@ -717,6 +765,30 @@
               {
                 "nid": 562986004,
                 "strtype": "OBJECT/Pressed",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 1159728225,
+                "strtype": "SLIDER/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 255840475,
+                "strtype": "SLIDER/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -295352813,
+                "strtype": "SLIDER/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 366340478,
+                "strtype": "SLIDER/User_4",
                 "strval": "False",
                 "InheritedType": 2
               },
@@ -994,6 +1066,30 @@
                 "InheritedType": 2
               },
               {
+                "nid": -229516054,
+                "strtype": "IMAGE/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -1613545997,
+                "strtype": "IMAGE/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 1814807479,
+                "strtype": "IMAGE/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -1648574472,
+                "strtype": "IMAGE/User_4",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
                 "nid": 1417082499,
                 "flags": 1048576,
                 "strtype": "IMAGE/Image",
@@ -1206,6 +1302,30 @@
                 "InheritedType": 2
               },
               {
+                "nid": -2082648624,
+                "strtype": "ROLLER/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 276197639,
+                "strtype": "ROLLER/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 1333006621,
+                "strtype": "ROLLER/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -28202817,
+                "strtype": "ROLLER/User_4",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
                 "nid": 736370992,
                 "strtype": "ROLLER/Label",
                 "InheritedType": 1
@@ -1406,6 +1526,30 @@
               {
                 "nid": 1943043444,
                 "strtype": "OBJECT/Pressed",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 977357179,
+                "strtype": "ROLLER/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -387732565,
+                "strtype": "ROLLER/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 918587759,
+                "strtype": "ROLLER/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -1180946954,
+                "strtype": "ROLLER/User_4",
                 "strval": "False",
                 "InheritedType": 2
               },
@@ -1663,6 +1807,30 @@
                 "InheritedType": 2
               },
               {
+                "nid": -322384181,
+                "strtype": "LABEL/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 1958725427,
+                "strtype": "LABEL/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 38086845,
+                "strtype": "LABEL/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -1268378352,
+                "strtype": "LABEL/User_4",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
                 "nid": -312658141,
                 "strtype": "LABEL/Label",
                 "InheritedType": 1
@@ -1913,6 +2081,30 @@
                 "InheritedType": 2
               },
               {
+                "nid": -841852149,
+                "strtype": "LABEL/User_1",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -356457862,
+                "strtype": "LABEL/User_2",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": 2006106414,
+                "strtype": "LABEL/User_3",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
+                "nid": -765031447,
+                "strtype": "LABEL/User_4",
+                "strval": "False",
+                "InheritedType": 2
+              },
+              {
                 "nid": -1762178351,
                 "strtype": "LABEL/Label",
                 "InheritedType": 1
@@ -2087,6 +2279,30 @@
             "InheritedType": 2
           },
           {
+            "nid": -1162213928,
+            "strtype": "SCREEN/User_1",
+            "strval": "False",
+            "InheritedType": 2
+          },
+          {
+            "nid": 1719616782,
+            "strtype": "SCREEN/User_2",
+            "strval": "False",
+            "InheritedType": 2
+          },
+          {
+            "nid": 810119708,
+            "strtype": "SCREEN/User_3",
+            "strval": "False",
+            "InheritedType": 2
+          },
+          {
+            "nid": -352199123,
+            "strtype": "SCREEN/User_4",
+            "strval": "False",
+            "InheritedType": 2
+          },
+          {
             "part": "lv.PART.MAIN",
             "childs": [],
             "nid": -1449493026,
@@ -2130,7 +2346,7 @@
     "description": "",
     "board": "Arduino with TFT_eSPI",
     "board_version": "v1.0.0",
-    "editor_version": "1.2.2",
+    "editor_version": "1.2.3",
     "image": "",
     "force_export_images": false,
     "pointfilter": false,
@@ -2139,6 +2355,7 @@
     "theme_color1": 5,
     "theme_color2": 0,
     "exportFolderPath": "/Users/Shared/LVGL_Music_Player/Lvgl_Music_Player",
+    "projectExportFolderPath": "/Users/Shared/LVGL_Music_Player/Lvgl_Music_Player",
     "backup_cnt": 8,
     "autosave_cnt": 0,
     "lvgl_version": "8.2.0",

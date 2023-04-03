@@ -96,6 +96,7 @@ static int song_count = 0;
 static char textBuf[6];
 static uint32_t currentSongDuration = 0;
 static uint32_t currentTimeProgress = 0;
+static String playingStr;
 static size_t coverImgFileSize = 0;
 static uint8_t *coverImgFile;
 static int16_t coverImgBitmapW;
@@ -216,6 +217,7 @@ void play_selected_song()
   currentTimeProgress = 0;
   syncTimeLyricsCount = 0;
   isPlaying = true;
+  playingStr = "";
   lv_img_set_src(ui_ImageCover, nullptr);
 }
 
@@ -286,7 +288,8 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    lv_obj_set_style_anim_time(ui_RollerLyrics, 2000, LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_speed(ui_LabelPlaying, 10, LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
@@ -317,7 +320,7 @@ void setup()
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-  delay(1);
+  delay(5);
   if (isSelectedSongChanged)
   {
     isSelectedSongChanged = false;
@@ -369,6 +372,12 @@ void audio_id3data(const char *info)
 { // id3 metadata
   Serial.print("id3data     ");
   Serial.println(info);
+  if (playingStr.length() > 0)
+  {
+    playingStr += " ";
+  }
+  playingStr += info;
+  lv_label_set_text(ui_LabelPlaying, playingStr.c_str());
 }
 void audio_id3image(File &file, const size_t pos, const size_t size)
 {
