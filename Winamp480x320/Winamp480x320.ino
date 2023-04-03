@@ -221,6 +221,53 @@ void play_selected_song()
   lv_img_set_src(ui_ImageCover, nullptr);
 }
 
+void prevSong(lv_event_t *e)
+{
+  int16_t selected_id = lv_roller_get_selected(ui_RollerPlayList);
+  selected_id--;
+  if (selected_id < 0)
+  {
+    selected_id = song_count - 1;
+  }
+  lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
+  play_selected_song();
+}
+
+void playSong(lv_event_t *e)
+{
+  if (isPlaying)
+  {
+    audio.pauseResume();
+  }
+  else
+  {
+    play_selected_song();
+  }
+}
+
+void pauseSong(lv_event_t *e)
+{
+  audio.pauseResume();
+}
+
+void stopSong(lv_event_t *e)
+{
+  audio.stopSong();
+  isPlaying = false;
+}
+
+void nextSong(lv_event_t *e)
+{
+  uint16_t selected_id = lv_roller_get_selected(ui_RollerPlayList);
+  selected_id++;
+  if (selected_id >= song_count)
+  {
+    selected_id = 0;
+  }
+  lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
+  play_selected_song();
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -293,6 +340,11 @@ void setup()
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ui_ButtonPrev, prevSong, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(ui_ButtonPlay, playSong, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(ui_ButtonPause, pauseSong, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(ui_ButtonStop, stopSong, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(ui_ButtonNext, nextSong, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
 
     Serial.println("Setup done");
@@ -342,8 +394,8 @@ void Task_Audio(void *pvParameters) // This is a task.
         {
           // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
           lv_slider_set_range(ui_ScaleProgress, 0, currentSongDuration);
-          sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
-          lv_label_set_text(ui_LabelDuration, textBuf);
+          // sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
+          // lv_label_set_text(ui_LabelDuration, textBuf);
         }
       }
       uint32_t currentTime = audio.getAudioCurrentTime();
@@ -588,12 +640,5 @@ void audio_eof_mp3(const char *info)
   Serial.print("eof_mp3     ");
   Serial.println(info);
 
-  uint16_t selected_id = lv_roller_get_selected(ui_RollerPlayList);
-  selected_id++;
-  if (selected_id >= song_count)
-  {
-    selected_id = 0;
-  }
-  lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
-  play_selected_song();
+  nextSong(nullptr);
 }

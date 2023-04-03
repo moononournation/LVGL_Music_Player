@@ -32,14 +32,23 @@ extern lv_obj_t *ui_RollerLyrics;
 extern lv_obj_t *ui_Panel2;
 extern lv_obj_t *ui_ImageCover;
 extern lv_obj_t *ui_LabelProgress;
-extern lv_obj_t *ui_LabelDuration;
 extern lv_obj_t *ui_LabelPlaying;
+extern lv_obj_t *ui_ButtonPrev;
+extern lv_obj_t *ui_ButtonPlay;
+extern lv_obj_t *ui_ButtonPause;
+extern lv_obj_t *ui_ButtonStop;
+extern lv_obj_t *ui_ButtonNext;
 extern lv_obj_t *ui____initial_actions0;
 
 
 LV_IMG_DECLARE( ui_img_winamp480x320_png);   // assets/Winamp480x320.png
 LV_IMG_DECLARE( ui_img_volume_png);   // assets/volume.png
 LV_IMG_DECLARE( ui_img_progress_png);   // assets/progress.png
+LV_IMG_DECLARE( ui_img_prev_png);   // assets/prev.png
+LV_IMG_DECLARE( ui_img_play_png);   // assets/play.png
+LV_IMG_DECLARE( ui_img_pause_png);   // assets/pause.png
+LV_IMG_DECLARE( ui_img_stop_png);   // assets/stop.png
+LV_IMG_DECLARE( ui_img_next_png);   // assets/next.png
 LV_IMG_DECLARE( ui_img_winamp480x480_png);   // assets/Winamp480x480.png
 
 

@@ -16,8 +16,12 @@ lv_obj_t *ui_RollerLyrics;
 lv_obj_t *ui_Panel2;
 lv_obj_t *ui_ImageCover;
 lv_obj_t *ui_LabelProgress;
-lv_obj_t *ui_LabelDuration;
 lv_obj_t *ui_LabelPlaying;
+lv_obj_t *ui_ButtonPrev;
+lv_obj_t *ui_ButtonPlay;
+lv_obj_t *ui_ButtonPause;
+lv_obj_t *ui_ButtonStop;
+lv_obj_t *ui_ButtonNext;
 lv_obj_t *ui____initial_actions0;
 const lv_img_dsc_t *ui_imgset_winamp480x[1] = {&ui_img_winamp480x320_png};
 const lv_img_dsc_t *ui_imgset_winampx[1] = {&ui_img_winamp480x480_png};
@@ -162,17 +166,6 @@ lv_obj_set_style_text_color(ui_LabelProgress, lv_color_hex(0x00CC00), LV_PART_MA
 lv_obj_set_style_text_opa(ui_LabelProgress, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_LabelProgress, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-ui_LabelDuration = lv_label_create(ui_Screen1);
-lv_obj_set_width( ui_LabelDuration, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_LabelDuration, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_LabelDuration, -154 );
-lv_obj_set_y( ui_LabelDuration, -120 );
-lv_obj_set_align( ui_LabelDuration, LV_ALIGN_CENTER );
-lv_label_set_text(ui_LabelDuration,"00:00");
-lv_obj_set_style_text_color(ui_LabelDuration, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
-lv_obj_set_style_text_opa(ui_LabelDuration, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelDuration, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
-
 ui_LabelPlaying = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelPlaying, 154);
 lv_obj_set_height( ui_LabelPlaying, LV_SIZE_CONTENT);   /// 1
@@ -184,6 +177,56 @@ lv_label_set_text(ui_LabelPlaying,"Title: 塚。愛 Artist: Fatboy SettingsForEn
 lv_obj_set_style_text_color(ui_LabelPlaying, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelPlaying, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_LabelPlaying, &ui_font_Cubic11, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_ButtonPrev = lv_btn_create(ui_Screen1);
+lv_obj_set_width( ui_ButtonPrev, 39);
+lv_obj_set_height( ui_ButtonPrev, 18);
+lv_obj_set_x( ui_ButtonPrev, -204 );
+lv_obj_set_y( ui_ButtonPrev, -62 );
+lv_obj_set_align( ui_ButtonPrev, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_ButtonPrev, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_clear_flag( ui_ButtonPrev, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_bg_img_src( ui_ButtonPrev, &ui_img_prev_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+
+ui_ButtonPlay = lv_btn_create(ui_Screen1);
+lv_obj_set_width( ui_ButtonPlay, 39);
+lv_obj_set_height( ui_ButtonPlay, 18);
+lv_obj_set_x( ui_ButtonPlay, -164 );
+lv_obj_set_y( ui_ButtonPlay, -62 );
+lv_obj_set_align( ui_ButtonPlay, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_ButtonPlay, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_clear_flag( ui_ButtonPlay, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_bg_img_src( ui_ButtonPlay, &ui_img_play_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+
+ui_ButtonPause = lv_btn_create(ui_Screen1);
+lv_obj_set_width( ui_ButtonPause, 39);
+lv_obj_set_height( ui_ButtonPause, 18);
+lv_obj_set_x( ui_ButtonPause, -124 );
+lv_obj_set_y( ui_ButtonPause, -62 );
+lv_obj_set_align( ui_ButtonPause, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_ButtonPause, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_clear_flag( ui_ButtonPause, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_bg_img_src( ui_ButtonPause, &ui_img_pause_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+
+ui_ButtonStop = lv_btn_create(ui_Screen1);
+lv_obj_set_width( ui_ButtonStop, 39);
+lv_obj_set_height( ui_ButtonStop, 18);
+lv_obj_set_x( ui_ButtonStop, -84 );
+lv_obj_set_y( ui_ButtonStop, -62 );
+lv_obj_set_align( ui_ButtonStop, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_ButtonStop, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_clear_flag( ui_ButtonStop, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_bg_img_src( ui_ButtonStop, &ui_img_stop_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+
+ui_ButtonNext = lv_btn_create(ui_Screen1);
+lv_obj_set_width( ui_ButtonNext, 39);
+lv_obj_set_height( ui_ButtonNext, 18);
+lv_obj_set_x( ui_ButtonNext, -44 );
+lv_obj_set_y( ui_ButtonNext, -62 );
+lv_obj_set_align( ui_ButtonNext, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_ButtonNext, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_clear_flag( ui_ButtonNext, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_obj_set_style_bg_img_src( ui_ButtonNext, &ui_img_next_png, LV_PART_MAIN | LV_STATE_DEFAULT );
 
 }
 
