@@ -33,6 +33,8 @@ extern lv_obj_t *ui_Panel2;
 extern lv_obj_t *ui_ImageCover;
 extern lv_obj_t *ui_LabelProgress;
 extern lv_obj_t *ui_LabelPlaying;
+extern lv_obj_t *ui_LabelKbps;
+extern lv_obj_t *ui_LabelKHz;
 extern lv_obj_t *ui_ButtonPrev;
 extern lv_obj_t *ui_ButtonPlay;
 extern lv_obj_t *ui_ButtonPause;

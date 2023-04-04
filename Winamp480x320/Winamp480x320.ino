@@ -78,7 +78,7 @@ TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_ADD);
 Arduino_DataBus *bus = new Arduino_ESP32LCD8(
     0 /* DC */, GFX_NOT_DEFINED /* CS */, 47 /* WR */, GFX_NOT_DEFINED /* RD */,
     9 /* D0 */, 46 /* D1 */, 3 /* D2 */, 8 /* D3 */, 18 /* D4 */, 17 /* D5 */, 16 /* D6 */, 15 /* D7 */);
-Arduino_GFX *gfx = new Arduino_ST7796(bus, 4 /* RST */, 1 /* rotation */, true /* IPS */);
+Arduino_GFX *gfx = new Arduino_ST7796(bus, 4 /* RST */, 3 /* rotation */, true /* IPS */);
 /*******************************************************************************
  * End of Arduino_GFX setting
  ******************************************************************************/
@@ -133,8 +133,8 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
     TP_Point t = touch.getPoint(0);
     /*Set the coordinates*/
-    data->point.x = t.y;
-    data->point.y = 320 - t.x;
+    data->point.x = 480 - t.y;
+    data->point.y = t.x;
   }
   else
   {
@@ -206,19 +206,27 @@ void read_song_list()
   lv_roller_set_options(ui_RollerPlayList, stringSongList.c_str(), LV_ROLLER_MODE_INFINITE);
 }
 
-void play_selected_song()
+void cleanup_value()
 {
   isPlaying = false;
+  currentSongDuration = 0;
+  currentTimeProgress = 0;
+  syncTimeLyricsCount = 0;
+  playingStr = "";
+  syncTimeLyricsCount = 0;
+
+  lv_obj_add_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
+}
+
+void play_selected_song()
+{
+  cleanup_value();
   char song_filename[256];
   lv_roller_get_selected_str(ui_RollerPlayList, song_filename, sizeof(song_filename));
   Serial.printf("Play: %s\n", song_filename);
   audio.connecttoFS(SD_MMC, song_filename);
-  currentSongDuration = 0;
-  currentTimeProgress = 0;
-  syncTimeLyricsCount = 0;
   isPlaying = true;
-  playingStr = "";
-  lv_img_set_src(ui_ImageCover, nullptr);
 }
 
 void prevSong(lv_event_t *e)
@@ -253,7 +261,7 @@ void pauseSong(lv_event_t *e)
 void stopSong(lv_event_t *e)
 {
   audio.stopSong();
-  isPlaying = false;
+  cleanup_value();
 }
 
 void nextSong(lv_event_t *e)
@@ -360,7 +368,7 @@ void setup()
   else
   {
     audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
-    audio.setVolume(4); // 0...21
+    volumeChanged(nullptr);
 
     read_song_list();
     play_selected_song();
@@ -414,6 +422,14 @@ void Task_Audio(void *pvParameters) // This is a task.
             lv_roller_set_selected(ui_RollerLyrics, syncTimeLyricsLineIdx[i], LV_ANIM_ON);
           }
         }
+
+        uint32_t kbps = audio.getBitRate(true);
+        sprintf(textBuf, "%d", kbps / 1000);
+        lv_label_set_text(ui_LabelKbps, textBuf);
+
+        uint32_t khz = audio.getSampleRate();
+        sprintf(textBuf, "%d", khz / 1000);
+        lv_label_set_text(ui_LabelKHz, textBuf);
       }
     }
     delay(1);
@@ -507,6 +523,7 @@ void audio_id3image(File &file, const size_t pos, const size_t size)
         Serial.printf("zW: %d, zH: %d\n", zW, zH);
         lv_img_set_zoom(ui_ImageCover, (zW < zH) ? zW : zH);
         lv_img_set_src(ui_ImageCover, &img_cover);
+        lv_obj_clear_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
       }
       jpegdec.close();
     }
@@ -633,6 +650,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     }
 
     lv_roller_set_options(ui_RollerLyrics, lyricsText, LV_ROLLER_MODE_NORMAL);
+    lv_obj_clear_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
   }
 }
 void audio_eof_mp3(const char *info)
