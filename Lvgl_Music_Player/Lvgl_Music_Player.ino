@@ -42,7 +42,7 @@
 #define TOUCH_SCL 45
 #define TOUCH_SDA 19
 #define TOUCH_RES -1
-#define TOUCH_ADD 0x1A
+#define TOUCH_ADD CTS328_SLAVE_ADDRESS
 // microSD card
 #define SD_SCK 48
 #define SD_MISO 41

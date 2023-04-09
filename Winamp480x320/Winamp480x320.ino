@@ -41,7 +41,7 @@
 #define TOUCH_SCL 5
 #define TOUCH_SDA 6
 #define TOUCH_RES -1
-#define TOUCH_ADD 0x38
+#define TOUCH_ADD FT5x06_ADDR
 // microSD card
 #define SD_SCK 39
 #define SD_MISO 38

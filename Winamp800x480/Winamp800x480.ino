@@ -41,7 +41,7 @@
 #define TOUCH_SCL 20
 #define TOUCH_SDA 19
 #define TOUCH_RES 38
-#define TOUCH_ADD 0x5D
+#define TOUCH_ADD GT911_SLAVE_ADDRESS1
 // microSD card
 #define SD_SCK 12
 #define SD_MISO 13
