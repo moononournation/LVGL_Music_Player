@@ -154,7 +154,7 @@ static void draw_fft_level_meter(Arduino_GFX *meter_gfx)
     int32_t ph = prev_h[bx];
     if (h != ph)
     {
-      prev_h[bx] = y;
+      prev_h[bx] = h;
       if (h < ph)
       {
         meter_gfx->fillRect(x, y - (ph - h), bw - 1, ph - h, BLACK);
