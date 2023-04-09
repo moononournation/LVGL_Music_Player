@@ -628,7 +628,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   -6,
-                  -121
+                  -122
                 ],
                 "InheritedType": 7
               },
@@ -2173,8 +2173,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -155,
-                  -131
+                  -158,
+                  -129
                 ],
                 "InheritedType": 7
               },
@@ -2772,7 +2772,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   -121,
-                  -106
+                  -107
                 ],
                 "InheritedType": 7
               },
@@ -3072,7 +3072,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   -75,
-                  -106
+                  -107
                 ],
                 "InheritedType": 7
               },
@@ -4936,7 +4936,7 @@
     "theme_color2": 0,
     "exportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp480x320",
     "projectExportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp480x320",
-    "backup_cnt": 20,
+    "backup_cnt": 21,
     "autosave_cnt": 0,
     "lvgl_version": "8.2.0",
     "callfuncsexport": "C_FILE",

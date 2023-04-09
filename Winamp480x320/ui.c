@@ -26,6 +26,7 @@ lv_obj_t *ui_ButtonStop;
 lv_obj_t *ui_ButtonNext;
 lv_obj_t *ui____initial_actions0;
 const lv_img_dsc_t *ui_imgset_winamp480x[1] = {&ui_img_winamp480x320_png};
+const lv_img_dsc_t *ui_imgset_winampx[1] = {&ui_img_winamp480x480_png};
 const lv_img_dsc_t *ui_imgset_winamp800x[1] = {&ui_img_winamp800x480_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -80,7 +81,7 @@ if (lv_slider_get_mode(ui_ScaleVolume)==LV_SLIDER_MODE_RANGE ) lv_slider_set_lef
 lv_obj_set_width( ui_ScaleVolume, 52);
 lv_obj_set_height( ui_ScaleVolume, 34);
 lv_obj_set_x( ui_ScaleVolume, -6 );
-lv_obj_set_y( ui_ScaleVolume, -121 );
+lv_obj_set_y( ui_ScaleVolume, -122 );
 lv_obj_set_align( ui_ScaleVolume, LV_ALIGN_CENTER );
 lv_obj_set_style_radius(ui_ScaleVolume, 2, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_bg_color(ui_ScaleVolume, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
@@ -162,8 +163,8 @@ lv_obj_clear_flag( ui_ImageCover, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 ui_LabelProgress = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelProgress, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_LabelProgress, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_LabelProgress, -155 );
-lv_obj_set_y( ui_LabelProgress, -131 );
+lv_obj_set_x( ui_LabelProgress, -158 );
+lv_obj_set_y( ui_LabelProgress, -129 );
 lv_obj_set_align( ui_LabelProgress, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelProgress,"00:00");
 lv_obj_set_style_text_color(ui_LabelProgress, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
@@ -186,7 +187,7 @@ ui_LabelKbps = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelKbps, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_LabelKbps, LV_SIZE_CONTENT);   /// 1
 lv_obj_set_x( ui_LabelKbps, -121 );
-lv_obj_set_y( ui_LabelKbps, -106 );
+lv_obj_set_y( ui_LabelKbps, -107 );
 lv_obj_set_align( ui_LabelKbps, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelKbps,"384");
 lv_obj_set_style_text_color(ui_LabelKbps, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
@@ -197,7 +198,7 @@ ui_LabelKHz = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelKHz, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_LabelKHz, LV_SIZE_CONTENT);   /// 1
 lv_obj_set_x( ui_LabelKHz, -75 );
-lv_obj_set_y( ui_LabelKHz, -106 );
+lv_obj_set_y( ui_LabelKHz, -107 );
 lv_obj_set_align( ui_LabelKHz, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelKHz,"44");
 lv_obj_set_style_text_color(ui_LabelKHz, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
