@@ -162,8 +162,8 @@ lv_obj_clear_flag( ui_ImageCover, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 ui_LabelProgress = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelProgress, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_LabelProgress, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_LabelProgress, -314 );
-lv_obj_set_y( ui_LabelProgress, -212 );
+lv_obj_set_x( ui_LabelProgress, -316 );
+lv_obj_set_y( ui_LabelProgress, -209 );
 lv_obj_set_align( ui_LabelProgress, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelProgress,"00:00");
 lv_obj_set_style_text_color(ui_LabelProgress, lv_color_hex(0x00CC00), LV_PART_MAIN | LV_STATE_DEFAULT );
