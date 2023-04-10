@@ -386,7 +386,7 @@ void setup()
   pinMode(SD_CS /* CS */, OUTPUT);
   digitalWrite(SD_CS /* CS */, HIGH);
   SD_MMC.setPins(SD_SCK /* CLK */, SD_MOSI /* CMD/MOSI */, SD_MISO /* D0/MISO */);
-  if (!SD_MMC.begin("/root", true))
+  if (!SD_MMC.begin("/root", true /* mode1bit */, false /* format_if_mount_failed */, SDMMC_FREQ_DEFAULT))
   {
     Serial.println(F("ERROR: SD_MMC Mount Failed!"));
   }
