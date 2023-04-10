@@ -358,8 +358,8 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    lv_obj_set_style_anim_speed(ui_LabelPlaying, 10, LV_STATE_DEFAULT);
-    lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_speed(ui_LabelPlaying, 5, LV_STATE_DEFAULT);
+    // lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);

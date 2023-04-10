@@ -92,7 +92,7 @@ public:
   }
 };
 
-static constexpr size_t WAVE_SIZE = (44100 / 15);
+static constexpr size_t WAVE_SIZE = (44100 / 30);
 static fft_t fft;
 static uint16_t prev_h[(FFT_SIZE / 2) + 1];
 static uint16_t peak_y[(FFT_SIZE / 2) + 1];
