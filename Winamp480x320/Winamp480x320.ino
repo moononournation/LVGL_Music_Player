@@ -83,6 +83,12 @@ Arduino_GFX *gfx = new Arduino_ST7796(bus, 4 /* RST */, 3 /* rotation */, true /
  * End of Arduino_GFX setting
  ******************************************************************************/
 
+#include "FFT.h"
+#define CANVAS_FFT_WIDTH 75
+#define CANVAS_FFT_HEIGHT 17
+Arduino_Canvas *canvasFFT_gfx = new Arduino_Canvas(CANVAS_FFT_WIDTH /* width */, CANVAS_FFT_HEIGHT /* height */, NULL);
+lv_obj_t *ui_CanvasFFT;
+
 /* Change to your screen resolution */
 static uint32_t screenWidth;
 static uint32_t screenHeight;
@@ -343,8 +349,8 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    lv_obj_set_style_anim_speed(ui_LabelPlaying, 10, LV_STATE_DEFAULT);
-    lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_speed(ui_LabelPlaying, 5, LV_STATE_DEFAULT);
+    // lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
@@ -354,6 +360,16 @@ void setup()
     lv_obj_add_event_cb(ui_ButtonStop, stopSong, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(ui_ButtonNext, nextSong, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
+
+    canvasFFT_gfx->begin();
+    canvasFFT_gfx->fillScreen(BLACK);
+    ui_CanvasFFT = lv_canvas_create(ui_Screen1);
+    lv_canvas_set_buffer(ui_CanvasFFT, (lv_color_t *)canvasFFT_gfx->getFramebuffer(), CANVAS_FFT_WIDTH, CANVAS_FFT_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+    lv_obj_set_width(ui_CanvasFFT, CANVAS_FFT_WIDTH);
+    lv_obj_set_height(ui_CanvasFFT, CANVAS_FFT_HEIGHT);
+    lv_obj_set_x(ui_CanvasFFT, -179);
+    lv_obj_set_y(ui_CanvasFFT, -110);
+    lv_obj_set_align(ui_CanvasFFT, LV_ALIGN_CENTER);
 
     Serial.println("Setup done");
   }
@@ -659,4 +675,16 @@ void audio_eof_mp3(const char *info)
   Serial.println(info);
 
   nextSong(nullptr);
+}
+void audio_process_i2s(uint32_t *sample, bool *continueI2S)
+{
+  raw_data[raw_data_idx++] = *sample;
+  if (raw_data_idx >= WAVE_SIZE)
+  {
+    fft.exec((int16_t *)raw_data);
+    draw_fft_level_meter(canvasFFT_gfx);
+    lv_obj_invalidate(ui_CanvasFFT);
+    raw_data_idx = 0;
+  }
+  *continueI2S = true;
 }
