@@ -148,8 +148,8 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
     TP_Point t = touch.getPoint(0);
     /*Set the coordinates*/
-    data->point.x = 480 - t.y;
-    data->point.y = t.x;
+    data->point.x = t.x;
+    data->point.y = t.y;
   }
   else
   {
