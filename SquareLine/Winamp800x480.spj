@@ -536,6 +536,17 @@
                         "nid": -1130302750,
                         "strtype": "_style/Bg_Radius",
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": 1402170163,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          255,
+                          255,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -1326,7 +1337,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  3
+                  60
                 ],
                 "InheritedType": 7
               },
@@ -1336,7 +1347,7 @@
                 "strtype": "OBJECT/Size",
                 "intarray": [
                   508,
-                  446
+                  332
                 ],
                 "InheritedType": 7
               },
@@ -1508,20 +1519,31 @@
                         "strtype": "_style/Text_Spacing",
                         "intarray": [
                           0,
-                          2
+                          -8
                         ],
                         "InheritedType": 7
                       },
                       {
                         "nid": -1604319603,
                         "strtype": "_style/Text_Font",
-                        "strval": "Cubic11",
+                        "strval": "NotoSansCJKhk",
                         "InheritedType": 3
                       },
                       {
                         "nid": -1232620396,
                         "strtype": "_style/Bg_Radius",
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": 1971947850,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          255,
+                          255,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -1544,8 +1566,8 @@
                         "nid": 1506532075,
                         "strtype": "_style/Bg_Color",
                         "intarray": [
-                          0,
-                          0,
+                          204,
+                          102,
                           0,
                           255
                         ],
@@ -1603,7 +1625,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -140
+                  -120
                 ],
                 "InheritedType": 7
               },
@@ -1613,7 +1635,7 @@
                 "strtype": "OBJECT/Size",
                 "intarray": [
                   508,
-                  160
+                  200
                 ],
                 "InheritedType": 7
               },
@@ -1892,7 +1914,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -140
+                  -120
                 ],
                 "InheritedType": 7
               },
@@ -4936,7 +4958,7 @@
     "theme_color2": 0,
     "exportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp800x480",
     "projectExportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp800x480",
-    "backup_cnt": 20,
+    "backup_cnt": 25,
     "autosave_cnt": 0,
     "lvgl_version": "8.2.0",
     "callfuncsexport": "C_FILE",

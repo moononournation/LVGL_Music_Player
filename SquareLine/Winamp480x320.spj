@@ -536,6 +536,17 @@
                         "nid": -1130302750,
                         "strtype": "_style/Bg_Radius",
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": -1794513684,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          255,
+                          255,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -1326,7 +1337,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  2
+                  60
                 ],
                 "InheritedType": 7
               },
@@ -1336,7 +1347,7 @@
                 "strtype": "OBJECT/Size",
                 "intarray": [
                   187,
-                  287
+                  171
                 ],
                 "InheritedType": 7
               },
@@ -1522,6 +1533,17 @@
                         "nid": -1232620396,
                         "strtype": "_style/Bg_Radius",
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": 580683019,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          255,
+                          255,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -1544,8 +1566,8 @@
                         "nid": 1506532075,
                         "strtype": "_style/Bg_Color",
                         "intarray": [
-                          0,
-                          0,
+                          204,
+                          102,
                           0,
                           255
                         ],
@@ -1603,7 +1625,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -90
+                  -80
                 ],
                 "InheritedType": 7
               },
@@ -1613,7 +1635,7 @@
                 "strtype": "OBJECT/Size",
                 "intarray": [
                   187,
-                  100
+                  120
                 ],
                 "InheritedType": 7
               },
@@ -1892,7 +1914,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -90
+                  -80
                 ],
                 "InheritedType": 7
               },

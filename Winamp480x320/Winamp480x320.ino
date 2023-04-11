@@ -35,7 +35,7 @@
 // ZX3D50CE02S/WT32-SC01 PLUS
 // Cover size
 #define MP3_COVER_IMG_W 187
-#define MP3_COVER_IMG_H 100
+#define MP3_COVER_IMG_H 120
 // TOUCH
 #define TOUCH_MODULES_FT5x06 // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
 #define TOUCH_SCL 5
@@ -563,7 +563,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     file.seek(pos);
     file.read((uint8_t *)lyricsText, size);
     audio.unicode2utf8(lyricsText, size);
-    Serial.println(lyricsText);
+    // Serial.println(lyricsText);
 
     size_t idxA = 0;
     size_t idxB = 0;
@@ -620,7 +620,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
         currentSec += currentMinute * 60;
         if (currentSec > 0)
         {
-          Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
+          // Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
           syncTimeLyricsSec[syncTimeLyricsCount] = currentSec;
           syncTimeLyricsLineIdx[syncTimeLyricsCount] = lyricsLines;
           ++syncTimeLyricsCount;

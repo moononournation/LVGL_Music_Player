@@ -52,6 +52,7 @@ LV_IMG_DECLARE( ui_img_pause_png);   // assets/pause.png
 LV_IMG_DECLARE( ui_img_stop_png);   // assets/stop.png
 LV_IMG_DECLARE( ui_img_next_png);   // assets/next.png
 LV_IMG_DECLARE( ui_img_winamp480x320_png);   // assets/Winamp480x320.png
+LV_IMG_DECLARE( ui_img_winamp480x480_png);   // assets/Winamp480x480.png
 
 
 LV_FONT_DECLARE( ui_font_Cubic11);

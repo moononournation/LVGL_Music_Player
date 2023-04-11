@@ -536,6 +536,17 @@
                         "nid": -1130302750,
                         "strtype": "_style/Bg_Radius",
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": -1855009196,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          255,
+                          255,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -1326,7 +1337,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  2
+                  60
                 ],
                 "InheritedType": 7
               },
@@ -1336,7 +1347,7 @@
                 "strtype": "OBJECT/Size",
                 "intarray": [
                   187,
-                  447
+                  331
                 ],
                 "InheritedType": 7
               },
@@ -1522,6 +1533,17 @@
                         "nid": -1232620396,
                         "strtype": "_style/Bg_Radius",
                         "InheritedType": 6
+                      },
+                      {
+                        "nid": 1005874137,
+                        "strtype": "_style/Bg_Color",
+                        "intarray": [
+                          255,
+                          255,
+                          255,
+                          0
+                        ],
+                        "InheritedType": 7
                       }
                     ],
                     "InheritedType": 1
@@ -1544,8 +1566,8 @@
                         "nid": 1506532075,
                         "strtype": "_style/Bg_Color",
                         "intarray": [
-                          0,
-                          0,
+                          204,
+                          102,
                           0,
                           255
                         ],

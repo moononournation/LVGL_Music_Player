@@ -2,7 +2,8 @@
  * Extract from:
  * https://github.com/m5stack/M5Unified/blob/master/examples/Advanced/MP3_with_ESP8266Audio/MP3_with_ESP8266Audio.ino
  */
-#define FFT_SIZE 256
+// #define FFT_SIZE 256
+#define FFT_SIZE 128
 class fft_t
 {
   float _wr[FFT_SIZE + 1];
@@ -92,7 +93,7 @@ public:
   }
 };
 
-static constexpr size_t WAVE_SIZE = (44100 / 30);
+static constexpr size_t WAVE_SIZE = (44100 / 15);
 static fft_t fft;
 static uint16_t prev_h[(FFT_SIZE / 2) + 1];
 static uint16_t peak_y[(FFT_SIZE / 2) + 1];
@@ -128,14 +129,15 @@ static void init_peak_array()
 
 static void draw_fft_level_meter(Arduino_GFX *meter_gfx)
 {
-  size_t bw = 4;
+  // size_t bw = meter_gfx->width() / 60;
+  size_t bw = meter_gfx->width() / 19;
   if (bw < 3)
   {
     bw = 3;
   }
   int32_t fft_height = 17;
   int32_t fft_heightc = fft_height >> 2;
-  size_t xe = 19;
+  size_t xe = meter_gfx->width() / bw;
   if (xe > (FFT_SIZE / 2))
   {
     xe = (FFT_SIZE / 2);
@@ -145,7 +147,8 @@ static void draw_fft_level_meter(Arduino_GFX *meter_gfx)
   {
     size_t x = bx * bw;
     int32_t f = fft.get(bx);
-    int32_t h = (f * fft_height) >> 15;
+    // int32_t h = (f * fft_height) >> 18;
+    int32_t h = (f * fft_height) >> 13;
     if (h >= fft_height)
     {
       h = fft_height - 1;

@@ -35,7 +35,7 @@
 // ESP32_8048S070
 // Cover size
 #define MP3_COVER_IMG_W 508
-#define MP3_COVER_IMG_H 160
+#define MP3_COVER_IMG_H 200
 // TOUCH
 #define TOUCH_MODULES_GT911 // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
 #define TOUCH_SCL 20
@@ -62,8 +62,6 @@ JPEGDEC jpegdec;
 Audio audio;
 
 #include <SD_MMC.h>
-#include <SD.h>
-#define FILESYSTEM SD_MMC
 
 #include <TouchLib.h>
 TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_ADD);
@@ -89,6 +87,12 @@ Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
 /*******************************************************************************
  * End of Arduino_GFX setting
  ******************************************************************************/
+
+#include "FFT.h"
+#define CANVAS_FFT_WIDTH 75
+#define CANVAS_FFT_HEIGHT 17
+Arduino_Canvas *canvasFFT_gfx = new Arduino_Canvas(CANVAS_FFT_WIDTH /* width */, CANVAS_FFT_HEIGHT /* height */, NULL);
+lv_obj_t *ui_CanvasFFT;
 
 /* Change to your screen resolution */
 static uint32_t screenWidth;
@@ -182,7 +186,7 @@ void read_song_list()
 {
   String stringSongList = "";
 
-  File root = FILESYSTEM.open("/");
+  File root = SD_MMC.open("/");
   File file = root.openNextFile();
   while (file)
   {
@@ -221,6 +225,8 @@ void cleanup_value()
   syncTimeLyricsCount = 0;
   playingStr = "";
   syncTimeLyricsCount = 0;
+  init_peak_array();
+  canvasFFT_gfx->fillScreen(BLACK);
 
   lv_obj_add_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
@@ -232,7 +238,7 @@ void play_selected_song()
   char song_filename[256];
   lv_roller_get_selected_str(ui_RollerPlayList, song_filename, sizeof(song_filename));
   Serial.printf("Play: %s\n", song_filename);
-  audio.connecttoFS(FILESYSTEM, song_filename);
+  audio.connecttoFS(SD_MMC, song_filename);
   isPlaying = true;
 }
 
@@ -350,8 +356,8 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    lv_obj_set_style_anim_speed(ui_LabelPlaying, 10, LV_STATE_DEFAULT);
-    lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_speed(ui_LabelPlaying, 5, LV_STATE_DEFAULT);
+    // lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
@@ -362,21 +368,24 @@ void setup()
     lv_obj_add_event_cb(ui_ButtonNext, nextSong, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
 
+    canvasFFT_gfx->begin();
+    ui_CanvasFFT = lv_canvas_create(ui_Screen1);
+    lv_canvas_set_buffer(ui_CanvasFFT, (lv_color_t *)canvasFFT_gfx->getFramebuffer(), CANVAS_FFT_WIDTH, CANVAS_FFT_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+    lv_obj_set_width(ui_CanvasFFT, CANVAS_FFT_WIDTH);
+    lv_obj_set_height(ui_CanvasFFT, CANVAS_FFT_HEIGHT);
+    lv_obj_set_x(ui_CanvasFFT, -339);
+    lv_obj_set_y(ui_CanvasFFT, -190);
+    lv_obj_set_align(ui_CanvasFFT, LV_ALIGN_CENTER);
+
     Serial.println("Setup done");
   }
 
-#if (FILESYSTEM == SD_MMC)
   pinMode(SD_CS /* CS */, OUTPUT);
   digitalWrite(SD_CS /* CS */, HIGH);
   SD_MMC.setPins(SD_SCK /* CLK */, SD_MOSI /* CMD/MOSI */, SD_MISO /* D0/MISO */);
   if (!SD_MMC.begin("/root", true /* mode1bit */, false /* format_if_mount_failed */, SDMMC_FREQ_DEFAULT))
-#else
-  SPI.begin(SD_SCK, SD_MISO /* MISO */, SD_MOSI /* MOSI */, SD_CS /* SS */);
-  SPI.setFrequency(1000000);
-  if (!SD.begin(SD_CS /* SS */))
-#endif
   {
-    Serial.println(F("ERROR: SD Mount Failed!"));
+    Serial.println(F("ERROR: SD_MMC Mount Failed!"));
   }
   else
   {
@@ -560,7 +569,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     file.seek(pos);
     file.read((uint8_t *)lyricsText, size);
     audio.unicode2utf8(lyricsText, size);
-    Serial.println(lyricsText);
+    // Serial.println(lyricsText);
 
     size_t idxA = 0;
     size_t idxB = 0;
@@ -617,7 +626,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
         currentSec += currentMinute * 60;
         if (currentSec > 0)
         {
-          Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
+          // Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
           syncTimeLyricsSec[syncTimeLyricsCount] = currentSec;
           syncTimeLyricsLineIdx[syncTimeLyricsCount] = lyricsLines;
           ++syncTimeLyricsCount;
@@ -672,4 +681,16 @@ void audio_eof_mp3(const char *info)
   Serial.println(info);
 
   nextSong(nullptr);
+}
+void audio_process_i2s(uint32_t *sample, bool *continueI2S)
+{
+  raw_data[raw_data_idx++] = *sample;
+  if (raw_data_idx >= WAVE_SIZE)
+  {
+    fft.exec((int16_t *)raw_data);
+    draw_fft_level_meter(canvasFFT_gfx);
+    lv_obj_invalidate(ui_CanvasFFT);
+    raw_data_idx = 0;
+  }
+  *continueI2S = true;
 }

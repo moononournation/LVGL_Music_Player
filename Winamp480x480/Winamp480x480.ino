@@ -572,7 +572,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     file.seek(pos);
     file.read((uint8_t *)lyricsText, size);
     audio.unicode2utf8(lyricsText, size);
-    Serial.println(lyricsText);
+    // Serial.println(lyricsText);
 
     size_t idxA = 0;
     size_t idxB = 0;
@@ -629,7 +629,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
         currentSec += currentMinute * 60;
         if (currentSec > 0)
         {
-          Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
+          // Serial.printf("currentSec: %d, lyricsLines: %d\n", currentSec, lyricsLines);
           syncTimeLyricsSec[syncTimeLyricsCount] = currentSec;
           syncTimeLyricsLineIdx[syncTimeLyricsCount] = lyricsLines;
           ++syncTimeLyricsCount;
