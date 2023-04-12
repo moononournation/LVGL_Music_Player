@@ -476,7 +476,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
   }
   else if (size > lyricsTextSize)
   {
-    lyricsText = (char *)realloc(coverImgFile, size);
+    lyricsText = (char *)realloc(lyricsText, size);
     lyricsTextSize = size;
   }
   if (lyricsText)

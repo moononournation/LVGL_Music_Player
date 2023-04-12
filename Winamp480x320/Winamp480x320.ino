@@ -220,6 +220,8 @@ void cleanup_value()
   syncTimeLyricsCount = 0;
   playingStr = "";
   syncTimeLyricsCount = 0;
+  init_peak_array();
+  canvasFFT_gfx->fillScreen(BLACK);
 
   lv_obj_add_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
@@ -362,7 +364,6 @@ void setup()
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
 
     canvasFFT_gfx->begin();
-    canvasFFT_gfx->fillScreen(BLACK);
     ui_CanvasFFT = lv_canvas_create(ui_Screen1);
     lv_canvas_set_buffer(ui_CanvasFFT, (lv_color_t *)canvasFFT_gfx->getFramebuffer(), CANVAS_FFT_WIDTH, CANVAS_FFT_HEIGHT, LV_IMG_CF_TRUE_COLOR);
     lv_obj_set_width(ui_CanvasFFT, CANVAS_FFT_WIDTH);
@@ -463,27 +464,27 @@ void audio_id3data(const char *info)
   playingStr += info;
   lv_label_set_text(ui_LabelPlaying, playingStr.c_str());
 }
-void audio_id3image(File &file, const size_t pos, const size_t size)
+void audio_id3image(File &file, const size_t pos, const size_t len)
 {
-  Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, size);
+  Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, len);
   if (coverImgFileSize == 0)
   {
-    coverImgFile = (uint8_t *)malloc(size);
-    coverImgFileSize = size;
+    coverImgFile = (uint8_t *)malloc(len);
+    coverImgFileSize = len;
   }
-  else if (size > coverImgFileSize)
+  else if (len > coverImgFileSize)
   {
-    coverImgFile = (uint8_t *)realloc(coverImgFile, size);
-    coverImgFileSize = size;
+    coverImgFile = (uint8_t *)realloc(coverImgFile, len);
+    coverImgFileSize = len;
   }
   if (coverImgFile)
   {
     file.seek(pos);
-    file.read(coverImgFile, size);
+    file.read(coverImgFile, len);
     Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
     Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
 
-    jpegdec.openRAM(coverImgFile + 14, size - 14, jpegDrawCallback);
+    jpegdec.openRAM(coverImgFile + 14, len - 14, jpegDrawCallback);
 
     int scale = 0;
     coverImgBitmapW = jpegdec.getWidth();
@@ -545,24 +546,25 @@ void audio_id3image(File &file, const size_t pos, const size_t size)
     }
   }
 }
-void audio_id3lyrics(File &file, const size_t pos, const size_t size)
+void audio_id3lyrics(File &file, const size_t pos, const size_t len)
 {
-  Serial.printf("audio_id3lyrics, pos: %d, size: %d\n", pos, size);
+  Serial.printf("audio_id3lyrics, pos: %d, size: %d\n", pos, len);
+  size_t len2 = len << 1;
   if (lyricsTextSize == 0)
   {
-    lyricsText = (char *)malloc(size);
-    lyricsTextSize = size;
+    lyricsText = (char *)malloc(len2);
+    lyricsTextSize = len2;
   }
-  else if (size > lyricsTextSize)
+  else if (len2 > lyricsTextSize)
   {
-    lyricsText = (char *)realloc(coverImgFile, size);
-    lyricsTextSize = size;
+    lyricsText = (char *)realloc(lyricsText, len2);
+    lyricsTextSize = len2;
   }
   if (lyricsText)
   {
     file.seek(pos);
-    file.read((uint8_t *)lyricsText, size);
-    audio.unicode2utf8(lyricsText, size);
+    file.read((uint8_t *)lyricsText, len);
+    audio.unicode2utf8(lyricsText, len);
     // Serial.println(lyricsText);
 
     size_t idxA = 0;
@@ -574,7 +576,10 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     uint16_t currentSec;
     bool seenColon;
     bool seenDecimal;
-    while (idxA < size)
+    while (
+      (idxA < len2)
+      && (lyricsText[idxA])
+    )
     {
       if (lyricsText[idxA] == '[')
       {
