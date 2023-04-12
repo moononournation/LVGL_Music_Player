@@ -490,10 +490,21 @@ void audio_id3image(File &file, const size_t pos, const size_t len)
   {
     file.seek(pos);
     file.read(coverImgFile, len);
-    Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
-    Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
+    Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15], coverImgFile[16], coverImgFile[17], coverImgFile[18], coverImgFile[19], coverImgFile[20], coverImgFile[21], coverImgFile[22], coverImgFile[23], coverImgFile[24], coverImgFile[25], coverImgFile[26], coverImgFile[27], coverImgFile[28], coverImgFile[29], coverImgFile[30], coverImgFile[31]);
+    Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15], coverImgFile[16], coverImgFile[17], coverImgFile[18], coverImgFile[19], coverImgFile[20], coverImgFile[21], coverImgFile[22], coverImgFile[23], coverImgFile[24], coverImgFile[25], coverImgFile[26], coverImgFile[27], coverImgFile[28], coverImgFile[29], coverImgFile[30], coverImgFile[31]);
 
-    jpegdec.openRAM(coverImgFile + 14, len - 14, jpegDrawCallback);
+    size_t idx = 11;
+    // seek JPEG header
+    while (
+      (idx < len)
+      && (
+        (coverImgFile[idx++] != 0xFF)
+        || (coverImgFile[idx] != 0xD8)
+      )
+    );
+    --idx;
+    Serial.printf("idx: %d\n", idx);
+    jpegdec.openRAM(coverImgFile + idx, len - idx, jpegDrawCallback);
 
     int scale = 0;
     coverImgBitmapW = jpegdec.getWidth();
