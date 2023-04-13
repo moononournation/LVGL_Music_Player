@@ -145,9 +145,9 @@ lv_obj_set_style_bg_opa(ui_RollerLyrics, 255, LV_PART_SELECTED| LV_STATE_DEFAULT
 
 ui_Panel2 = lv_obj_create(ui_Screen1);
 lv_obj_set_width( ui_Panel2, 187);
-lv_obj_set_height( ui_Panel2, 160);
+lv_obj_set_height( ui_Panel2, 140);
 lv_obj_set_x( ui_Panel2, 138 );
-lv_obj_set_y( ui_Panel2, -60 );
+lv_obj_set_y( ui_Panel2, -70 );
 lv_obj_set_align( ui_Panel2, LV_ALIGN_CENTER );
 lv_obj_clear_flag( ui_Panel2, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 lv_obj_set_style_radius(ui_Panel2, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
@@ -159,7 +159,7 @@ ui_ImageCover = lv_img_create(ui_Screen1);
 lv_obj_set_width( ui_ImageCover, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_ImageCover, LV_SIZE_CONTENT);   /// 1
 lv_obj_set_x( ui_ImageCover, 138 );
-lv_obj_set_y( ui_ImageCover, -60 );
+lv_obj_set_y( ui_ImageCover, -70 );
 lv_obj_set_align( ui_ImageCover, LV_ALIGN_CENTER );
 lv_obj_add_flag( ui_ImageCover, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
 lv_obj_clear_flag( ui_ImageCover, LV_OBJ_FLAG_SCROLLABLE );    /// Flags

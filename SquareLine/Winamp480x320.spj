@@ -1625,7 +1625,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -60
+                  -70
                 ],
                 "InheritedType": 7
               },
@@ -1635,7 +1635,7 @@
                 "strtype": "OBJECT/Size",
                 "intarray": [
                   187,
-                  160
+                  140
                 ],
                 "InheritedType": 7
               },
@@ -1914,7 +1914,7 @@
                 "strtype": "OBJECT/Position",
                 "intarray": [
                   138,
-                  -60
+                  -70
                 ],
                 "InheritedType": 7
               },
