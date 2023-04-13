@@ -35,7 +35,7 @@
 // ZX3D50CE02S/WT32-SC01 PLUS
 // Cover size
 #define MP3_COVER_IMG_W 187
-#define MP3_COVER_IMG_H 120
+#define MP3_COVER_IMG_H 160
 // TOUCH
 #define TOUCH_MODULES_FT5x06 // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
 #define TOUCH_SCL 5
@@ -195,10 +195,9 @@ void read_song_list()
 
       int8_t len = strlen(filename);
       const char *MP3_EXT = ".mp3";
-      if (
-          (filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
+      if ((filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
       {
-        Serial.printf("Song file: %s, size: %d\n", filename, file.size());
+        // Serial.printf("Song file: %s, size: %d\n", filename, file.size());
         if (song_count > 0)
         {
           stringSongList += '\n';
