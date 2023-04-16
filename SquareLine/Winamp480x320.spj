@@ -820,7 +820,7 @@
               {
                 "nid": 807698420,
                 "strtype": "SLIDER/Value",
-                "integer": 15,
+                "integer": 10,
                 "InheritedType": 6
               },
               {
@@ -4958,7 +4958,7 @@
     "theme_color2": 0,
     "exportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp480x320",
     "projectExportFolderPath": "/Users/Shared/LVGL_Music_Player/Winamp480x320",
-    "backup_cnt": 21,
+    "backup_cnt": 22,
     "autosave_cnt": 0,
     "lvgl_version": "8.2.0",
     "callfuncsexport": "C_FILE",

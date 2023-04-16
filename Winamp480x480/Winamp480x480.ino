@@ -37,11 +37,12 @@
 #define MP3_COVER_IMG_W 187
 #define MP3_COVER_IMG_H 180
 // TOUCH
-#define TOUCH_MODULES_GT911 // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
+#define TOUCH_MODULES_GT911                    // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
+#define TOUCH_MODULE_ADDR GT911_SLAVE_ADDRESS1 // CTS328_SLAVE_ADDRESS / L58_SLAVE_ADDRESS / CTS826_SLAVE_ADDRESS / CTS820_SLAVE_ADDRESS / CTS816S_SLAVE_ADDRESS / FT3267_SLAVE_ADDRESS / FT5x06_ADDR / GT911_SLAVE_ADDRESS1 / GT911_SLAVE_ADDRESS2 / ZTW622_SLAVE1_ADDRESS / ZTW622_SLAVE2_ADDRESS
 #define TOUCH_SCL 18
 #define TOUCH_SDA 17
 #define TOUCH_RES 38
-#define TOUCH_ADD GT911_SLAVE_ADDRESS1
+#define TOUCH_INT -1
 // microSD card
 #define SD_SCK 12
 #define SD_MISO 13
@@ -63,8 +64,7 @@ Audio audio;
 
 #include <SD_MMC.h>
 
-#include <TouchLib.h>
-TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_ADD);
+#include "touch.h"
 
 /*******************************************************************************
  * Start of Arduino_GFX setting
@@ -142,14 +142,20 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
-  if (touch.read())
+  if (touch_has_signal())
   {
-    data->state = LV_INDEV_STATE_PR;
+    if (touch_touched())
+    {
+      data->state = LV_INDEV_STATE_PR;
 
-    TP_Point t = touch.getPoint(0);
-    /*Set the coordinates*/
-    data->point.x = t.x;
-    data->point.y = t.y;
+      /*Set the coordinates*/
+      data->point.x = touch_last_x;
+      data->point.y = touch_last_y;
+    }
+    else if (touch_released())
+    {
+      data->state = LV_INDEV_STATE_REL;
+    }
   }
   else
   {
@@ -204,10 +210,9 @@ void read_song_list()
 
       int8_t len = strlen(filename);
       const char *MP3_EXT = ".mp3";
-      if (
-          (filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
+      if ((filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
       {
-        Serial.printf("Song file: %s, size: %d\n", filename, file.size());
+        // Serial.printf("Song file: %s, size: %d\n", filename, file.size());
         if (song_count > 0)
         {
           stringSongList += '\n';
@@ -313,16 +318,8 @@ void setup()
   digitalWrite(GFX_BL, HIGH);
 #endif
 
-  // init touch
-#if (TOUCH_RES > 0)
-  pinMode(TOUCH_RES, OUTPUT);
-  digitalWrite(TOUCH_RES, 0);
-  delay(200);
-  digitalWrite(TOUCH_RES, 1);
-  delay(200);
-#endif
-  Wire.begin(TOUCH_SDA, TOUCH_SCL);
-  touch.init();
+  // Init touch device
+  touch_init(gfx->width(), gfx->height(), gfx->getRotation());
 
   lv_init();
 
@@ -361,7 +358,7 @@ void setup()
     ui_init();
 
     lv_obj_set_style_anim_speed(ui_LabelPlaying, 5, LV_STATE_DEFAULT);
-    // lv_obj_set_style_anim_time(ui_RollerLyrics, 1000, LV_STATE_DEFAULT);
+    lv_obj_set_style_anim_time(ui_RollerLyrics, 0, LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
@@ -378,7 +375,7 @@ void setup()
     lv_obj_set_width(ui_CanvasFFT, CANVAS_FFT_WIDTH);
     lv_obj_set_height(ui_CanvasFFT, CANVAS_FFT_HEIGHT);
     lv_obj_set_x(ui_CanvasFFT, -179);
-    lv_obj_set_y(ui_CanvasFFT, -190);
+    lv_obj_set_y(ui_CanvasFFT, -110);
     lv_obj_set_align(ui_CanvasFFT, LV_ALIGN_CENTER);
 
     Serial.println("Setup done");
@@ -444,8 +441,8 @@ void Task_Audio(void *pvParameters) // This is a task.
         {
           if (syncTimeLyricsSec[i] == currentTime)
           {
-
             lv_roller_set_selected(ui_RollerLyrics, syncTimeLyricsLineIdx[i], LV_ANIM_ON);
+            break;
           }
         }
 
@@ -495,13 +492,8 @@ void audio_id3image(File &file, const size_t pos, const size_t len)
 
     size_t idx = 11;
     // seek JPEG header
-    while (
-      (idx < len)
-      && (
-        (coverImgFile[idx++] != 0xFF)
-        || (coverImgFile[idx] != 0xD8)
-      )
-    );
+    while ((idx < len) && ((coverImgFile[idx++] != 0xFF) || (coverImgFile[idx] != 0xD8)))
+      ;
     --idx;
     Serial.printf("idx: %d\n", idx);
     jpegdec.openRAM(coverImgFile + idx, len - idx, jpegDrawCallback);
@@ -561,6 +553,7 @@ void audio_id3image(File &file, const size_t pos, const size_t len)
         lv_img_set_zoom(ui_ImageCover, (zW < zH) ? zW : zH);
         lv_img_set_src(ui_ImageCover, &img_cover);
         lv_obj_clear_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_invalidate(ui_Screen1);
       }
       jpegdec.close();
     }
@@ -597,9 +590,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t len)
     bool seenColon;
     bool seenDecimal;
     while (
-      (idxA < len2)
-      && (lyricsText[idxA])
-    )
+        (idxA < len2) && (lyricsText[idxA]))
     {
       if (lyricsText[idxA] == '[')
       {
@@ -692,6 +683,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t len)
 
     lv_roller_set_options(ui_RollerLyrics, lyricsText, LV_ROLLER_MODE_NORMAL);
     lv_obj_clear_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_invalidate(ui_Screen1);
   }
 }
 void audio_eof_mp3(const char *info)

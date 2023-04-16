@@ -39,10 +39,11 @@
 #define MP3_COVER_IMG_H 150
 // TOUCH
 #define TOUCH_MODULES_CST_MUTUAL // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
+#define TOUCH_MODULE_ADDR CTS328_SLAVE_ADDRESS // CTS328_SLAVE_ADDRESS / L58_SLAVE_ADDRESS / CTS826_SLAVE_ADDRESS / CTS820_SLAVE_ADDRESS / CTS816S_SLAVE_ADDRESS / FT3267_SLAVE_ADDRESS / FT5x06_ADDR / GT911_SLAVE_ADDRESS1 / GT911_SLAVE_ADDRESS2 / ZTW622_SLAVE1_ADDRESS / ZTW622_SLAVE2_ADDRESS
 #define TOUCH_SCL 45
 #define TOUCH_SDA 19
 #define TOUCH_RES -1
-#define TOUCH_ADD CTS328_SLAVE_ADDRESS
+#define TOUCH_INT -1
 // microSD card
 #define SD_SCK 48
 #define SD_MISO 41
@@ -64,8 +65,7 @@ Audio audio;
 
 #include <SD_MMC.h>
 
-#include <TouchLib.h>
-TouchLib touch(Wire, TOUCH_SDA, TOUCH_SCL, TOUCH_ADD);
+#include "touch.h"
 
 /*******************************************************************************
  * Start of Arduino_GFX setting
@@ -136,14 +136,20 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
-  if (touch.read())
+  if (touch_has_signal())
   {
-    data->state = LV_INDEV_STATE_PR;
+    if (touch_touched())
+    {
+      data->state = LV_INDEV_STATE_PR;
 
-    TP_Point t = touch.getPoint(0);
-    /*Set the coordinates*/
-    data->point.x = t.x;
-    data->point.y = t.y;
+      /*Set the coordinates*/
+      data->point.x = touch_last_x;
+      data->point.y = touch_last_y;
+    }
+    else if (touch_released())
+    {
+      data->state = LV_INDEV_STATE_REL;
+    }
   }
   else
   {
@@ -249,16 +255,8 @@ void setup()
   digitalWrite(GFX_BL, HIGH);
 #endif
 
-  // init touch
-#if (TOUCH_RES > 0)
-  pinMode(TOUCH_RES, OUTPUT);
-  digitalWrite(TOUCH_RES, 0);
-  delay(200);
-  digitalWrite(TOUCH_RES, 1);
-  delay(200);
-#endif
-  Wire.begin(TOUCH_SDA, TOUCH_SCL);
-  touch.init();
+  // Init touch device
+  touch_init(gfx->width(), gfx->height(), gfx->getRotation());
 
   lv_init();
 
