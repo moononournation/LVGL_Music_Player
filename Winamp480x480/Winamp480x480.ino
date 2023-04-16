@@ -375,7 +375,7 @@ void setup()
     lv_obj_set_width(ui_CanvasFFT, CANVAS_FFT_WIDTH);
     lv_obj_set_height(ui_CanvasFFT, CANVAS_FFT_HEIGHT);
     lv_obj_set_x(ui_CanvasFFT, -179);
-    lv_obj_set_y(ui_CanvasFFT, -110);
+    lv_obj_set_y(ui_CanvasFFT, -190);
     lv_obj_set_align(ui_CanvasFFT, LV_ALIGN_CENTER);
 
     Serial.println("Setup done");
