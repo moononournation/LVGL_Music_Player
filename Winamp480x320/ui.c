@@ -33,8 +33,8 @@ const lv_img_dsc_t *ui_imgset_winamp800x[1] = {&ui_img_winamp800x480_png};
 #if LV_COLOR_DEPTH != 16
     #error "LV_COLOR_DEPTH should be 16bit to match SquareLine Studio's settings"
 #endif
-#if LV_COLOR_16_SWAP !=0
-    #error "LV_COLOR_16_SWAP should be 0 to match SquareLine Studio's settings"
+#if LV_COLOR_16_SWAP !=1
+    #error "LV_COLOR_16_SWAP should be 1 to match SquareLine Studio's settings"
 #endif
 
 ///////////////////// ANIMATIONS ////////////////////
@@ -139,6 +139,7 @@ lv_obj_set_style_text_font(ui_RollerLyrics, &ui_font_Cubic11, LV_PART_MAIN| LV_S
 lv_obj_set_style_radius(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_bg_color(ui_RollerLyrics, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_border_width(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 lv_obj_set_style_bg_color(ui_RollerLyrics, lv_color_hex(0xCC6600), LV_PART_SELECTED | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_RollerLyrics, 255, LV_PART_SELECTED| LV_STATE_DEFAULT);

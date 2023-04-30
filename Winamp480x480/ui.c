@@ -78,7 +78,7 @@ lv_obj_set_style_bg_opa(ui_RollerPlayList, 255, LV_PART_SELECTED| LV_STATE_DEFAU
 
 ui_ScaleVolume = lv_slider_create(ui_Screen1);
 lv_slider_set_range(ui_ScaleVolume, 0,31);
-lv_slider_set_value( ui_ScaleVolume, 15, LV_ANIM_OFF);
+lv_slider_set_value( ui_ScaleVolume, 10, LV_ANIM_OFF);
 if (lv_slider_get_mode(ui_ScaleVolume)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_ScaleVolume, 0, LV_ANIM_OFF);
 lv_obj_set_width( ui_ScaleVolume, 52);
 lv_obj_set_height( ui_ScaleVolume, 34);

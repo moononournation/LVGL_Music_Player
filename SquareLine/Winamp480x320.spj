@@ -1544,6 +1544,11 @@
                           0
                         ],
                         "InheritedType": 7
+                      },
+                      {
+                        "nid": -774903821,
+                        "strtype": "_style/Border width",
+                        "InheritedType": 6
                       }
                     ],
                     "InheritedType": 1
@@ -1872,7 +1877,8 @@
                 "InheritedType": 11
               }
             ],
-            "saved_objtypeKey": "PANEL"
+            "saved_objtypeKey": "PANEL",
+            "tree_closed": true
           },
           {
             "guid": "GUID53323609-856529S924263",
@@ -4938,7 +4944,7 @@
   "animations": [],
   "info": {
     "name": "SquareLine_Project.spj",
-    "depth": 1,
+    "depth": 2,
     "width": 480,
     "height": 320,
     "rotation": 180,
@@ -4951,7 +4957,7 @@
     "editor_version": "1.2.3",
     "image": "",
     "force_export_images": false,
-    "pointfilter": false,
+    "pointfilter": true,
     "theme_simplified": false,
     "theme_dark": true,
     "theme_color1": 5,

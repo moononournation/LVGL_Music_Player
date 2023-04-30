@@ -140,6 +140,12 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
   lv_disp_flush_ready(disp);
 }
 
+void force_refresh_screen()
+{
+  lv_obj_invalidate(ui_Screen1);
+  lv_timer_handler(); /* let the GUI do its work */
+}
+
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
   if (touch_has_signal())
@@ -224,6 +230,8 @@ void read_song_list()
     file = root.openNextFile();
   }
   lv_roller_set_options(ui_RollerPlayList, stringSongList.c_str(), LV_ROLLER_MODE_INFINITE);
+
+  force_refresh_screen();
 }
 
 void cleanup_value()
@@ -358,6 +366,8 @@ void setup()
     ui_init();
 
     lv_obj_set_style_anim_speed(ui_LabelPlaying, 5, LV_STATE_DEFAULT);
+    lv_obj_clear_flag(ui_RollerPlayList, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_set_style_anim_time(ui_RollerPlayList, 0, LV_STATE_DEFAULT);
     lv_obj_set_style_anim_time(ui_RollerLyrics, 0, LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
@@ -538,6 +548,9 @@ void audio_id3image(File &file, const size_t pos, const size_t len)
       }
       if (coverImgBitmap)
       {
+#if (LV_COLOR_16_SWAP != 0)
+        jpegdec.setPixelType(RGB565_BIG_ENDIAN);
+#endif
         jpegdec.decode(0, 0, scale);
 
         img_cover.header.cf = LV_IMG_CF_TRUE_COLOR;
@@ -553,7 +566,8 @@ void audio_id3image(File &file, const size_t pos, const size_t len)
         lv_img_set_zoom(ui_ImageCover, (zW < zH) ? zW : zH);
         lv_img_set_src(ui_ImageCover, &img_cover);
         lv_obj_clear_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_invalidate(ui_Screen1);
+
+        force_refresh_screen();
       }
       jpegdec.close();
     }
@@ -683,7 +697,8 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t len)
 
     lv_roller_set_options(ui_RollerLyrics, lyricsText, LV_ROLLER_MODE_NORMAL);
     lv_obj_clear_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_invalidate(ui_Screen1);
+
+    force_refresh_screen();
   }
 }
 void audio_eof_mp3(const char *info)

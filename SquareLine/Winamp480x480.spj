@@ -351,7 +351,6 @@
               },
               {
                 "nid": -1451191939,
-                "flags": 1048576,
                 "strtype": "OBJECT/Flags",
                 "InheritedType": 1
               },
@@ -429,7 +428,6 @@
               },
               {
                 "nid": 1520349045,
-                "flags": 1048576,
                 "strtype": "OBJECT/States",
                 "InheritedType": 1
               },
@@ -820,7 +818,7 @@
               {
                 "nid": 807698420,
                 "strtype": "SLIDER/Value",
-                "integer": 15,
+                "integer": 10,
                 "InheritedType": 6
               },
               {
