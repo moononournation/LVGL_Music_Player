@@ -1,7 +1,7 @@
 /*******************************************************************************
  * LVGL Music Player
- * A simple implementation of a Music Player
- * UI can be substaintial changed by SquareLine with single source code
+ * This is a simple example for LVGL - Light and Versatile Graphics Library
+ * import from: https://github.com/lvgl/lv_demos.git
  *
  * TODO:
  * change Lyrics font colors
@@ -38,7 +38,7 @@
 #define MP3_COVER_IMG_W 200
 #define MP3_COVER_IMG_H 150
 // TOUCH
-#define TOUCH_MODULES_CST_MUTUAL // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
+#define TOUCH_MODULES_CST_MUTUAL               // GT911 / CST_SELF / CST_MUTUAL / ZTW622 / L58 / FT3267 / FT5x06
 #define TOUCH_MODULE_ADDR CTS328_SLAVE_ADDRESS // CTS328_SLAVE_ADDRESS / L58_SLAVE_ADDRESS / CTS826_SLAVE_ADDRESS / CTS820_SLAVE_ADDRESS / CTS816S_SLAVE_ADDRESS / FT3267_SLAVE_ADDRESS / FT5x06_ADDR / GT911_SLAVE_ADDRESS1 / GT911_SLAVE_ADDRESS2 / ZTW622_SLAVE1_ADDRESS / ZTW622_SLAVE2_ADDRESS
 #define TOUCH_SCL 45
 #define TOUCH_SDA 19
@@ -134,6 +134,12 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
   lv_disp_flush_ready(disp);
 }
 
+void force_refresh_screen()
+{
+  lv_obj_invalidate(ui_Screen1);
+  lv_timer_handler(); /* let the GUI do its work */
+}
+
 void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
   if (touch_has_signal())
@@ -204,10 +210,9 @@ void read_song_list()
 
       int8_t len = strlen(filename);
       const char *MP3_EXT = ".mp3";
-      if (
-          (filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
+      if ((filename[0] != '.') && (strcmp(MP3_EXT, &filename[len - 4]) == 0))
       {
-        Serial.printf("Song file: %s, size: %d\n", filename, file.size());
+        // Serial.printf("Song file: %s, size: %d\n", filename, file.size());
         if (song_count > 0)
         {
           stringSongList += '\n';
@@ -219,20 +224,42 @@ void read_song_list()
     file = root.openNextFile();
   }
   lv_roller_set_options(ui_RollerPlayList, stringSongList.c_str(), LV_ROLLER_MODE_INFINITE);
+
+  force_refresh_screen();
+}
+
+void cleanup_value()
+{
+  isPlaying = false;
+  currentSongDuration = 0;
+  currentTimeProgress = 0;
+  syncTimeLyricsCount = 0;
+  syncTimeLyricsCount = 0;
+
+  lv_obj_add_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
 }
 
 void play_selected_song()
 {
-  isPlaying = false;
+  cleanup_value();
   char song_filename[256];
   lv_roller_get_selected_str(ui_RollerPlayList, song_filename, sizeof(song_filename));
   Serial.printf("Play: %s\n", song_filename);
   audio.connecttoFS(SD_MMC, song_filename);
-  currentSongDuration = 0;
-  currentTimeProgress = 0;
-  syncTimeLyricsCount = 0;
   isPlaying = true;
-  lv_img_set_src(ui_ImageCover, nullptr);
+}
+
+void nextSong(lv_event_t *e)
+{
+  uint16_t selected_id = lv_roller_get_selected(ui_RollerPlayList);
+  selected_id++;
+  if (selected_id >= song_count)
+  {
+    selected_id = 0;
+  }
+  lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
+  play_selected_song();
 }
 
 void setup()
@@ -294,15 +321,12 @@ void setup()
     /* Init SquareLine prepared UI */
     ui_init();
 
-    lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
-
-    lv_obj_set_style_text_font(ui_RollerLyrics, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui_RollerLyrics, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(ui_RollerPlayList, LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    lv_obj_set_style_anim_time(ui_RollerPlayList, 0, LV_STATE_DEFAULT);
     lv_obj_set_style_anim_time(ui_RollerLyrics, 2000, LV_STATE_DEFAULT);
 
-    lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(ui_ScaleVolume, volumeChanged, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ui_ScaleProgress, timeProgressChanged, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_RollerPlayList, playListChanged, LV_EVENT_VALUE_CHANGED, NULL);
 
     Serial.println("Setup done");
@@ -318,7 +342,7 @@ void setup()
   else
   {
     audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
-    audio.setVolume(4); // 0...21
+    volumeChanged(nullptr);
 
     read_song_list();
     play_selected_song();
@@ -330,7 +354,7 @@ void setup()
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-  delay(1);
+  delay(5);
   if (isSelectedSongChanged)
   {
     isSelectedSongChanged = false;
@@ -352,8 +376,8 @@ void Task_Audio(void *pvParameters) // This is a task.
         {
           // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
           lv_slider_set_range(ui_ScaleProgress, 0, currentSongDuration);
-          sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
-          lv_label_set_text(ui_LabelDuration, textBuf);
+          // sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
+          // lv_label_set_text(ui_LabelDuration, textBuf);
         }
       }
       uint32_t currentTime = audio.getAudioCurrentTime();
@@ -368,8 +392,8 @@ void Task_Audio(void *pvParameters) // This is a task.
         {
           if (syncTimeLyricsSec[i] == currentTime)
           {
-
             lv_roller_set_selected(ui_RollerLyrics, syncTimeLyricsLineIdx[i], LV_ANIM_ON);
+            break;
           }
         }
       }
@@ -383,27 +407,33 @@ void audio_id3data(const char *info)
   Serial.print("id3data     ");
   Serial.println(info);
 }
-void audio_id3image(File &file, const size_t pos, const size_t size)
+void audio_id3image(File &file, const size_t pos, const size_t len)
 {
-  Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, size);
+  Serial.printf("audio_id3image, pos: %d, size: %d\n", pos, len);
   if (coverImgFileSize == 0)
   {
-    coverImgFile = (uint8_t *)malloc(size);
-    coverImgFileSize = size;
+    coverImgFile = (uint8_t *)malloc(len);
+    coverImgFileSize = len;
   }
-  else if (size > coverImgFileSize)
+  else if (len > coverImgFileSize)
   {
-    coverImgFile = (uint8_t *)realloc(coverImgFile, size);
-    coverImgFileSize = size;
+    coverImgFile = (uint8_t *)realloc(coverImgFile, len);
+    coverImgFileSize = len;
   }
   if (coverImgFile)
   {
     file.seek(pos);
-    file.read(coverImgFile, size);
-    Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
-    Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15]);
+    file.read(coverImgFile, len);
+    Serial.printf("%c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c, %c\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15], coverImgFile[16], coverImgFile[17], coverImgFile[18], coverImgFile[19], coverImgFile[20], coverImgFile[21], coverImgFile[22], coverImgFile[23], coverImgFile[24], coverImgFile[25], coverImgFile[26], coverImgFile[27], coverImgFile[28], coverImgFile[29], coverImgFile[30], coverImgFile[31]);
+    Serial.printf("%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X\n", coverImgFile[0], coverImgFile[1], coverImgFile[2], coverImgFile[3], coverImgFile[4], coverImgFile[5], coverImgFile[6], coverImgFile[7], coverImgFile[8], coverImgFile[9], coverImgFile[10], coverImgFile[11], coverImgFile[12], coverImgFile[13], coverImgFile[14], coverImgFile[15], coverImgFile[16], coverImgFile[17], coverImgFile[18], coverImgFile[19], coverImgFile[20], coverImgFile[21], coverImgFile[22], coverImgFile[23], coverImgFile[24], coverImgFile[25], coverImgFile[26], coverImgFile[27], coverImgFile[28], coverImgFile[29], coverImgFile[30], coverImgFile[31]);
 
-    jpegdec.openRAM(coverImgFile + 14, size - 14, jpegDrawCallback);
+    size_t idx = 11;
+    // seek JPEG header
+    while ((idx < len) && ((coverImgFile[idx++] != 0xFF) || (coverImgFile[idx] != 0xD8)))
+      ;
+    --idx;
+    Serial.printf("idx: %d\n", idx);
+    jpegdec.openRAM(coverImgFile + idx, len - idx, jpegDrawCallback);
 
     int scale = 0;
     coverImgBitmapW = jpegdec.getWidth();
@@ -445,6 +475,9 @@ void audio_id3image(File &file, const size_t pos, const size_t size)
       }
       if (coverImgBitmap)
       {
+#if (LV_COLOR_16_SWAP != 0)
+        jpegdec.setPixelType(RGB565_BIG_ENDIAN);
+#endif
         jpegdec.decode(0, 0, scale);
 
         img_cover.header.cf = LV_IMG_CF_TRUE_COLOR;
@@ -459,29 +492,33 @@ void audio_id3image(File &file, const size_t pos, const size_t size)
         Serial.printf("zW: %d, zH: %d\n", zW, zH);
         lv_img_set_zoom(ui_ImageCover, (zW < zH) ? zW : zH);
         lv_img_set_src(ui_ImageCover, &img_cover);
+        lv_obj_clear_flag(ui_ImageCover, LV_OBJ_FLAG_HIDDEN);
+
+        force_refresh_screen();
       }
       jpegdec.close();
     }
   }
 }
-void audio_id3lyrics(File &file, const size_t pos, const size_t size)
+void audio_id3lyrics(File &file, const size_t pos, const size_t len)
 {
-  Serial.printf("audio_id3lyrics, pos: %d, size: %d\n", pos, size);
+  Serial.printf("audio_id3lyrics, pos: %d, size: %d\n", pos, len);
+  size_t len2 = len << 1;
   if (lyricsTextSize == 0)
   {
-    lyricsText = (char *)malloc(size);
-    lyricsTextSize = size;
+    lyricsText = (char *)malloc(len2);
+    lyricsTextSize = len2;
   }
-  else if (size > lyricsTextSize)
+  else if (len2 > lyricsTextSize)
   {
-    lyricsText = (char *)realloc(lyricsText, size);
-    lyricsTextSize = size;
+    lyricsText = (char *)realloc(lyricsText, len2);
+    lyricsTextSize = len2;
   }
   if (lyricsText)
   {
     file.seek(pos);
-    file.read((uint8_t *)lyricsText, size);
-    audio.unicode2utf8(lyricsText, size);
+    file.read((uint8_t *)lyricsText, len);
+    audio.unicode2utf8(lyricsText, len);
     // Serial.println(lyricsText);
 
     size_t idxA = 0;
@@ -493,7 +530,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     uint16_t currentSec;
     bool seenColon;
     bool seenDecimal;
-    while (idxA < size)
+    while ((idxA < len2) && (lyricsText[idxA]))
     {
       if (lyricsText[idxA] == '[')
       {
@@ -585,6 +622,9 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t size)
     }
 
     lv_roller_set_options(ui_RollerLyrics, lyricsText, LV_ROLLER_MODE_NORMAL);
+    lv_obj_clear_flag(ui_RollerLyrics, LV_OBJ_FLAG_HIDDEN);
+
+    force_refresh_screen();
   }
 }
 void audio_eof_mp3(const char *info)
@@ -592,12 +632,5 @@ void audio_eof_mp3(const char *info)
   Serial.print("eof_mp3     ");
   Serial.println(info);
 
-  uint16_t selected_id = lv_roller_get_selected(ui_RollerPlayList);
-  selected_id++;
-  if (selected_id >= song_count)
-  {
-    selected_id = 0;
-  }
-  lv_roller_set_selected(ui_RollerPlayList, selected_id, LV_ANIM_ON);
-  play_selected_song();
+  nextSong(nullptr);
 }

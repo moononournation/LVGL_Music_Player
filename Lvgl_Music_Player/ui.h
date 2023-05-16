@@ -37,6 +37,7 @@ extern lv_obj_t *ui____initial_actions0;
 
 LV_IMG_DECLARE( ui_img_winamp480x320_png);   // assets/Winamp480x320.png
 LV_IMG_DECLARE( ui_img_winamp480x480_png);   // assets/Winamp480x480.png
+LV_IMG_DECLARE( ui_img_winamp800x480_png);   // assets/Winamp800x480.png
 
 
 LV_FONT_DECLARE( ui_font_Cubic11);

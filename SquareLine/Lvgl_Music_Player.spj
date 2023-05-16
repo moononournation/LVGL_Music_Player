@@ -1344,7 +1344,31 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": -1681736125,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": 1600785100,
+                        "strtype": "_style/Text_Spacing",
+                        "intarray": [
+                          0,
+                          0
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": -2019030740,
+                        "strtype": "_style/Text_Font",
+                        "strval": "NotoSerifCJKhk",
+                        "InheritedType": 3
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 236338171,
                 "strtype": "ROLLER/Style_main",
                 "strval": "lv.PART.MAIN, Text, Rectangle",
@@ -1572,7 +1596,31 @@
               },
               {
                 "part": "lv.PART.MAIN",
-                "childs": [],
+                "childs": [
+                  {
+                    "nid": 830947585,
+                    "strtype": "_style/StyleState",
+                    "strval": "DEFAULT",
+                    "childs": [
+                      {
+                        "nid": -356716512,
+                        "strtype": "_style/Text_Spacing",
+                        "intarray": [
+                          0,
+                          0
+                        ],
+                        "InheritedType": 7
+                      },
+                      {
+                        "nid": -192603952,
+                        "strtype": "_style/Text_Font",
+                        "strval": "NotoSerifCJKhk",
+                        "InheritedType": 3
+                      }
+                    ],
+                    "InheritedType": 1
+                  }
+                ],
                 "nid": 324894210,
                 "strtype": "ROLLER/Style_main",
                 "strval": "lv.PART.MAIN, Text, Rectangle",

@@ -19,6 +19,7 @@ lv_obj_t *ui_LabelDuration;
 lv_obj_t *ui____initial_actions0;
 const lv_img_dsc_t *ui_imgset_winamp480x[1] = {&ui_img_winamp480x320_png};
 const lv_img_dsc_t *ui_imgset_winampx[1] = {&ui_img_winamp480x480_png};
+const lv_img_dsc_t *ui_imgset_winamp800x[1] = {&ui_img_winamp800x480_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -77,6 +78,9 @@ lv_obj_set_height( ui_RollerPlayList, 128);
 lv_obj_set_x( ui_RollerPlayList, 0 );
 lv_obj_set_y( ui_RollerPlayList, 176 );
 lv_obj_set_align( ui_RollerPlayList, LV_ALIGN_CENTER );
+lv_obj_set_style_text_letter_space(ui_RollerPlayList, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_line_space(ui_RollerPlayList, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_RollerPlayList, &ui_font_NotoSerifCJKhk, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_RollerLyrics = lv_roller_create(ui_Screen1);
 lv_roller_set_options( ui_RollerLyrics, "Option 1\nOption 2\nOption 3", LV_ROLLER_MODE_NORMAL );
@@ -85,6 +89,9 @@ lv_obj_set_height( ui_RollerLyrics, 108);
 lv_obj_set_x( ui_RollerLyrics, 0 );
 lv_obj_set_y( ui_RollerLyrics, 16 );
 lv_obj_set_align( ui_RollerLyrics, LV_ALIGN_CENTER );
+lv_obj_set_style_text_letter_space(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_line_space(ui_RollerLyrics, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_RollerLyrics, &ui_font_NotoSerifCJKhk, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelProgress = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelProgress, LV_SIZE_CONTENT);  /// 1

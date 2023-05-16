@@ -594,8 +594,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t len)
     uint16_t currentSec;
     bool seenColon;
     bool seenDecimal;
-    while (
-        (idxA < len2) && (lyricsText[idxA]))
+    while ((idxA < len2) && (lyricsText[idxA]))
     {
       if (lyricsText[idxA] == '[')
       {
