@@ -376,8 +376,8 @@ void Task_Audio(void *pvParameters) // This is a task.
         {
           // Serial.printf("currentSongDuration: %d\n", currentSongDuration);
           lv_slider_set_range(ui_ScaleProgress, 0, currentSongDuration);
-          // sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
-          // lv_label_set_text(ui_LabelDuration, textBuf);
+          sprintf(textBuf, "%02d:%02d", currentSongDuration / 60, currentSongDuration % 60);
+          lv_label_set_text(ui_LabelDuration, textBuf);
         }
       }
       uint32_t currentTime = audio.getAudioCurrentTime();
