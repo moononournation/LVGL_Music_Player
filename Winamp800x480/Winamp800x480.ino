@@ -104,7 +104,7 @@ static lv_disp_drv_t disp_drv;
 static bool isPlaying = false;
 static bool isSelectedSongChanged = false;
 static int song_count = 0;
-static char textBuf[6];
+static char textBuf[16];
 static uint32_t currentSongDuration = 0;
 static uint32_t currentTimeProgress = 0;
 static String playingStr;
@@ -594,7 +594,7 @@ void audio_id3lyrics(File &file, const size_t pos, const size_t len)
     size_t idxB = 0;
     size_t lastNewLineIdxB = 0;
     uint8_t lyricsLines = 0;
-    bool isSecTag;
+    bool isSecTag = false;
     uint8_t currentMinute;
     uint16_t currentSec;
     bool seenColon;

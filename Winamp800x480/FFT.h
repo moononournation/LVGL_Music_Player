@@ -156,7 +156,6 @@ static void draw_fft_level_meter(Arduino_GFX *meter_gfx)
     bw = 3;
   }
   int32_t fft_height = 17;
-  int32_t fft_heightc = fft_height >> 2;
   size_t xe = meter_gfx->width() / bw;
   if (xe > (FFT_SIZE / 2))
   {
