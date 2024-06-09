@@ -4,6 +4,19 @@
  *
  * Capacitive touchscreen libraries
  * TouchLib: https://github.com/mmMicky/TouchLib.git
+ *
+ * #define CTS328_SLAVE_ADDRESS  (0x1A)
+ * #define L58_SLAVE_ADDRESS     (0X5A)
+ * #define CTS826_SLAVE_ADDRESS  (0X15)
+ * #define CTS820_SLAVE_ADDRESS  (0X15)
+ * #define CTS816S_SLAVE_ADDRESS (0X15)
+ * #define FT3267_SLAVE_ADDRESS  (0x38)
+ * #define FT5x06_ADDR           (0x38)
+ * #define GT911_SLAVE_ADDRESS1  (0X5D)
+ * #define GT911_SLAVE_ADDRESS2  (0X14)
+ * #define ZTW622_SLAVE1_ADDRESS (0x20)
+ * #define ZTW622_SLAVE2_ADDRESS (0x46)
+ *
  ******************************************************************************/
 
 /* uncomment for XPT2046 */
@@ -131,7 +144,7 @@ void translate_touch_raw()
     touch_last_x = map(touch_raw_x, touch_map_x1, touch_map_x2, 0, touch_max_x);
     touch_last_y = map(touch_raw_y, touch_map_y1, touch_map_y2, 0, touch_max_y);
   }
-   Serial.printf("touch_raw_x: %d, touch_raw_y: %d, touch_last_x: %d, touch_last_y: %d\n", touch_raw_x, touch_raw_y, touch_last_x, touch_last_y);
+  // Serial.printf("touch_raw_x: %d, touch_raw_y: %d, touch_last_x: %d, touch_last_y: %d\n", touch_raw_x, touch_raw_y, touch_last_x, touch_last_y);
 }
 
 bool touch_touched()
@@ -187,4 +200,6 @@ bool touch_released()
 #elif defined(TOUCH_MODULE_ADDR) // TouchLib
   return false;
 #endif                           // TouchLib
+
+  return false;
 }
